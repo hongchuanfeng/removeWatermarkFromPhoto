@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import COS from 'cos-nodejs-sdk-v5'
-import crypto from 'crypto'
 
 const cos = new COS({
   SecretId: process.env.TENCENT_SECRET_ID,
@@ -18,7 +17,8 @@ function getSignedUrl(key: string, queryString: string = ''): Promise<string> {
         Region: process.env.TENCENT_COS_REGION!,
         Key: key,
         Sign: true,
-        QueryString: queryString.replace(/^\?/, ''), // remove leading "?" if present
+        // remove leading "?" if present, CI / ImageRepair 等处理参数通过 query 传入
+        QueryString: queryString.replace(/^\?/, ''),
       },
       (err, data) => {
         if (err) {
@@ -29,15 +29,6 @@ function getSignedUrl(key: string, queryString: string = ''): Promise<string> {
       }
     )
   })
-}
-
-// Helper function to generate Tencent Cloud API signature
-function generateSignature(secretKey: string, method: string, uri: string, params: Record<string, string>): string {
-  const sortedParams = Object.keys(params).sort().map(key => `${key}=${params[key]}`).join('&')
-  const signString = `${method}\n${uri}\n${sortedParams}\n`
-  const hmac = crypto.createHmac('sha1', secretKey)
-  hmac.update(signString)
-  return hmac.digest('base64')
 }
 
 export async function POST(request: NextRequest) {
@@ -130,50 +121,55 @@ export async function POST(request: NextRequest) {
       area: { x, y, width, height },
     })
 
-    // Call Tencent Cloud CI API for watermark removal
-    // Using Tencent Cloud Data Processing (数据万象) image processing
-    // Reference: https://cloud.tencent.com/document/product/460/79042
-    
+    // 根据腾讯云数据万象 ImageRepair 文档调用去水印接口
+    // 文档：https://cloud.tencent.com/document/product/460/79042
+    //
+    // 处理方式一：下载时处理
+    // GET /<ObjectKey>?ci-process=ImageRepair&MaskPoly=<MaskPoly> HTTP/1.1
+    // 其中 MaskPoly 为多边形坐标的 URL 安全 Base64 编码
+
     let resultUrl = imageUrl
-    let processedKey = key
-    
-    // If coordinates are provided, use them for targeted watermark removal
+
+    // 构造处理参数（query string，不带 ?）
+    let processingQuery = ''
+
     if (x && y && width && height) {
-      // Use imageMogr2 with region-specific processing
-      // For watermark removal, we can use blur or inpainting
-      // Format: imageMogr2/auto-orient/crop/{width}x{height}!{x}x{y}/blur/{radius}x{radius}
-      
-      // Calculate blur radius based on watermark size
-      const blurRadius = Math.max(20, Math.min(50, Math.max(parseInt(width), parseInt(height)) / 2))
-      
-      // Apply blur to the watermark region
-      // Note: imageMogr2 processes the entire image, so we need to crop first, blur, then composite
-      // For simplicity, we'll use a general blur approach
-      const processingParams = `?imageMogr2/auto-orient/blur/${blurRadius}x${blurRadius}`
-      resultUrl = `${imageUrl}${processingParams}`
-      
-      // Alternative: Use AI-based watermark removal if available
-      // resultUrl = `${imageUrl}?ci-process=AI&action=RemoveWatermark&x=${x}&y=${y}&width=${width}&height=${height}`
+      // 前端传入的是矩形区域，把矩形转换为 MaskPoly 多边形坐标：
+      // [[[x, y], [x+width, y], [x+width, y+height], [x, y+height]]]
+      const xNum = parseInt(x, 10)
+      const yNum = parseInt(y, 10)
+      const wNum = parseInt(width, 10)
+      const hNum = parseInt(height, 10)
+
+      const polygon = [
+        [
+          [xNum, yNum],
+          [xNum + wNum, yNum],
+          [xNum + wNum, yNum + hNum],
+          [xNum, yNum + hNum],
+        ],
+      ]
+
+      const polygonJson = JSON.stringify(polygon)
+      const base64 = Buffer.from(polygonJson).toString('base64')
+      // URL 安全的 Base64：替换 + / 并去掉 = 号
+      const urlSafeBase64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+
+      // 根据文档，ImageRepair 的 query 为：ci-process=ImageRepair&MaskPoly=<MaskPoly>
+      processingQuery = `ci-process=ImageRepair&MaskPoly=${encodeURIComponent(urlSafeBase64)}`
     } else {
-      // If no coordinates, use general watermark removal
-      // Try using AI-based processing or general image enhancement
-      const processingParams = `?imageMogr2/auto-orient/quality/90`
-      resultUrl = `${imageUrl}${processingParams}`
-      
-      // Note: For actual watermark removal without coordinates,
-      // you may need to use AI-based detection and removal
-      // This typically requires calling a specific API endpoint
+      // 如果没有提供坐标，就不做 ImageRepair，只做一个轻量的画质优化，保持兼容
+      // 注意：这里不是 ImageRepair，只是 imageMogr2 示例
+      processingQuery = 'imageMogr2/auto-orient/quality/90'
     }
-    
-    // For production, you might want to:
-    // 1. Download the processed image
-    // 2. Upload it back to COS with a new key
-    // 3. Return the new URL
-    
-    // Example: Download processed image and re-upload
+
+    // 预览用的 URL（未签名），前端不会去直接拉取私有桶内容，只作为记录
+    resultUrl = `${imageUrl}?${processingQuery}`
+
+    // 下载处理结果再回传到 COS
     try {
-      // Use signed URL to avoid 403 on private buckets
-      const signedProcessingUrl = await getSignedUrl(key, resultUrl.split('?')[1] || '')
+      // 使用带签名的 URL，避免私有桶 403
+      const signedProcessingUrl = await getSignedUrl(key, processingQuery)
       console.log('[remove-watermark] processing URL', { signedProcessingUrl })
       const processedResponse = await fetch(signedProcessingUrl)
       console.log('[remove-watermark] processing response', {

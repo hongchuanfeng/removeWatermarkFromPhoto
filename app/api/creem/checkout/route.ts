@@ -6,25 +6,64 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { product_id, metadata } = body
 
+    const apiUrl = process.env.CREEM_API_URL || 'https://api.creem.io'
+    const apiKey = process.env.CREEM_API_KEY || ''
+
+    console.log('[Creem Checkout] Request:', {
+      apiUrl: `${apiUrl}/v1/checkouts`,
+      product_id,
+      metadata,
+      hasApiKey: !!apiKey,
+    })
+
     const response = await axios.post(
-      `${process.env.CREEM_API_URL || 'https://api.creem.io'}/v1/checkouts`,
+      `${apiUrl}/v1/checkouts`,
       {
         product_id,
         metadata,
       },
       {
         headers: {
-          'x-api-key': process.env.CREEM_API_KEY || '',
+          'x-api-key': apiKey,
         },
       }
     )
 
-    return NextResponse.json({ url: response.data.url })
+    console.log('[Creem Checkout] Response:', {
+      status: response.status,
+      data: JSON.stringify(response.data, null, 2),
+    })
+
+    // Check multiple possible response formats
+    const checkoutUrl = 
+      response.data?.url || 
+      response.data?.checkout_url || 
+      response.data?.checkoutUrl ||
+      response.data?.redirect_url ||
+      response.data?.redirectUrl
+
+    if (!checkoutUrl) {
+      console.error('[Creem Checkout] No URL found in response:', response.data)
+      return NextResponse.json(
+        { error: 'No checkout URL returned from Creem API', response: response.data },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ url: checkoutUrl })
   } catch (error: any) {
-    console.error('Error creating checkout:', error)
+    console.error('[Creem Checkout] Error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers,
+    })
     return NextResponse.json(
-      { error: error.response?.data?.message || 'Failed to create checkout' },
-      { status: 500 }
+      { 
+        error: error.response?.data?.message || error.message || 'Failed to create checkout',
+        details: error.response?.data 
+      },
+      { status: error.response?.status || 500 }
     )
   }
 }

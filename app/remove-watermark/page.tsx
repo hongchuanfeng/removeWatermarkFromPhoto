@@ -28,6 +28,7 @@ export default function RemoveWatermarkPage() {
   const [isSelecting, setIsSelecting] = useState(false)
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null)
   const [currentArea, setCurrentArea] = useState<WatermarkArea | null>(null)
+  const [didDrag, setDidDrag] = useState(false)
   const imageRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
@@ -92,6 +93,11 @@ export default function RemoveWatermarkPage() {
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!preview || !imageSize || isSelecting) return
+    if (didDrag) {
+      // Click following a drag selection should not add another box
+      setDidDrag(false)
+      return
+    }
     
     const img = e.currentTarget.querySelector('img')
     if (!img) return
@@ -124,6 +130,7 @@ export default function RemoveWatermarkPage() {
     if (!preview || !imageSize) return
     e.preventDefault()
     setIsSelecting(true)
+    setDidDrag(false)
     const img = e.currentTarget.querySelector('img')
     if (!img) return
     
@@ -145,6 +152,9 @@ export default function RemoveWatermarkPage() {
     
     const width = Math.abs(x - startPos.x)
     const height = Math.abs(y - startPos.y)
+    if (width > 3 || height > 3) {
+      setDidDrag(true)
+    }
     const minX = Math.min(x, startPos.x)
     const minY = Math.min(y, startPos.y)
     
@@ -163,10 +173,10 @@ export default function RemoveWatermarkPage() {
   }
 
   const handleImageMouseUp = () => {
-    if (isSelecting && currentArea) {
+    if (isSelecting && currentArea && currentArea.width > 0 && currentArea.height > 0) {
       setWatermarkAreas([...watermarkAreas, currentArea])
-      setCurrentArea(null)
     }
+    setCurrentArea(null)
     setIsSelecting(false)
     setStartPos(null)
   }
@@ -353,9 +363,9 @@ export default function RemoveWatermarkPage() {
                           </div>
                         )
                       })}
-                      {currentArea && imageSize && imageRef.current && (
+                      {currentArea && isSelecting && currentArea.width > 0 && currentArea.height > 0 && imageSize && imageRef.current && (
                         <div
-                          className="absolute border-2 border-blue-500 bg-blue-500 bg-opacity-20"
+                          className="absolute border-2 border-blue-500 bg-blue-500 bg-opacity-20 pointer-events-none"
                           style={{
                             left: `${(currentArea.x / imageSize.width) * imageRef.current.getBoundingClientRect().width}px`,
                             top: `${(currentArea.y / imageSize.height) * imageRef.current.getBoundingClientRect().height}px`,

@@ -204,10 +204,10 @@ export default function RemoveWatermarkInline() {
   }
 
   const handleImageMouseUp = () => {
-    if (isSelecting && currentArea) {
+    if (isSelecting && currentArea && currentArea.width > 0 && currentArea.height > 0) {
       setWatermarkAreas([...watermarkAreas, currentArea])
-      setCurrentArea(null)
     }
+    setCurrentArea(null)
     setIsSelecting(false)
     setStartPos(null)
     // Leave didDrag state to suppress click that follows a drag
@@ -330,9 +330,9 @@ export default function RemoveWatermarkInline() {
                             </div>
                           )
                         })}
-                        {currentArea && imageSize && imageRef.current && (
+                        {currentArea && isSelecting && currentArea.width > 0 && currentArea.height > 0 && imageSize && imageRef.current && (
                           <div
-                            className="absolute border-2 border-blue-500 bg-blue-500 bg-opacity-20"
+                            className="absolute border-2 border-blue-500 bg-blue-500 bg-opacity-20 pointer-events-none"
                             style={{
                               left: `${(currentArea.x / imageSize.width) * imageRef.current.getBoundingClientRect().width}px`,
                               top: `${(currentArea.y / imageSize.height) * imageRef.current.getBoundingClientRect().height}px`,

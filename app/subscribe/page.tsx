@@ -30,6 +30,8 @@ export default function SubscribePage() {
     }
 
     try {
+      console.log('[Subscribe] Creating checkout for product:', productId)
+      
       const response = await axios.post(
         '/api/creem/checkout',
         {
@@ -41,12 +43,27 @@ export default function SubscribePage() {
         }
       )
 
+      console.log('[Subscribe] Checkout response:', response.data)
+
       if (response.data.url) {
+        console.log('[Subscribe] Redirecting to:', response.data.url)
         window.location.href = response.data.url
+      } else {
+        console.error('[Subscribe] No URL in response:', response.data)
+        alert(t('subscribe.checkoutError') || 'Failed to get checkout URL. Please try again.')
       }
-    } catch (error) {
-      console.error('Error creating checkout:', error)
-      alert(t('subscribe.checkoutError') || 'Failed to create checkout. Please try again.')
+    } catch (error: any) {
+      console.error('[Subscribe] Error creating checkout:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      })
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          t('subscribe.checkoutError') || 
+                          'Failed to create checkout. Please try again.'
+      alert(errorMessage)
     }
   }
 
@@ -60,7 +77,7 @@ export default function SubscribePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
         {t('subscribe.title')}
       </h1>
       <p className="text-center text-gray-600 mb-12">
@@ -80,9 +97,9 @@ export default function SubscribePage() {
                 {t('subscribe.mostPopular')}
               </div>
             )}
-            <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+            <h3 className="text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
             <div className="mb-4">
-              <span className="text-4xl font-bold">${plan.price}</span>
+              <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
               <span className="text-gray-600">{t('subscribe.month')}</span>
             </div>
             <div className="mb-6">
