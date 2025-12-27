@@ -22,10 +22,10 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL('https://removewatermark.chdaoai.com'),
   alternates: {
-    canonical: 'https://removewatermark.chdaoai.com',
+    canonical: '/',
     languages: {
-      'en': 'https://removewatermark.chdaoai.com/en',
-      'zh': 'https://removewatermark.chdaoai.com/zh',
+      'en': '/en',
+      'zh': '/zh',
     },
   },
   openGraph: {
@@ -53,9 +53,11 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
 }
 
@@ -66,10 +68,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="canonical" href="https://removewatermark.chdaoai.com" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
       <body className={inter.className}>
         {/* Google Analytics */}
         <Script

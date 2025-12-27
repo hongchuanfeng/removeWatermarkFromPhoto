@@ -92,12 +92,20 @@ export default function Navbar() {
             <div className="relative">
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value as 'en' | 'zh')}
+                onChange={(e) => setLanguage(e.target.value as 'en' | 'zh' | 'ru' | 'ar' | 'de' | 'ja' | 'fr' | 'es' | 'pt' | 'ko')}
                 className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer min-w-[120px]"
                 style={{ color: '#111827' }}
               >
                 <option value="en" style={{ color: '#111827', backgroundColor: '#ffffff' }}>English</option>
                 <option value="zh" style={{ color: '#111827', backgroundColor: '#ffffff' }}>中文</option>
+                <option value="ru" style={{ color: '#111827', backgroundColor: '#ffffff' }}>Русский</option>
+                <option value="ar" style={{ color: '#111827', backgroundColor: '#ffffff' }}>العربية</option>
+                <option value="de" style={{ color: '#111827', backgroundColor: '#ffffff' }}>Deutsch</option>
+                <option value="ja" style={{ color: '#111827', backgroundColor: '#ffffff' }}>日本語</option>
+                <option value="fr" style={{ color: '#111827', backgroundColor: '#ffffff' }}>Français</option>
+                <option value="es" style={{ color: '#111827', backgroundColor: '#ffffff' }}>Español</option>
+                <option value="pt" style={{ color: '#111827', backgroundColor: '#ffffff' }}>Português</option>
+                <option value="ko" style={{ color: '#111827', backgroundColor: '#ffffff' }}>한국어</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

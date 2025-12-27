@@ -11,6 +11,7 @@ export default function SubscribePage() {
   const { t } = useLanguage()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -126,6 +127,42 @@ export default function SubscribePage() {
           </div>
         ))}
       </div>
+
+      {/* FAQ Section */}
+      <section className="mt-20 bg-gray-800 py-16 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              {t('subscribe.faq.title')}
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((index) => (
+              <div
+                key={index}
+                className="bg-gray-700 rounded-lg overflow-hidden"
+              >
+                <button
+                  className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-600 transition"
+                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                >
+                  <span className="font-semibold text-white pr-4">
+                    {t(`subscribe.faq.q${index}`)}
+                  </span>
+                  <span className="text-primary-400 text-xl flex-shrink-0">
+                    {openFaqIndex === index ? '−' : '+'}
+                  </span>
+                </button>
+                {openFaqIndex === index && (
+                  <div className="px-6 py-4 bg-gray-600 text-gray-200">
+                    {t(`subscribe.faq.a${index}`)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

@@ -31,3 +31,12 @@
 13、UI要美观，要高大上，要实现响应式布局，要实现自适应布局，要实现响应式设计，要实现响应式设计。
 
 
+
+将public/image/b1.png作为去logo前的图片，将public/image/a1.png作为去logo后的图片，
+将public/image/b2.png作为去水印前的图片，将public/image/a2.png作为去水印后的图片，
+将public/image/b3.png作为去logo和去水印前的图片，将public/image/a3.png作为去logo和去水印后的图片。
+
+将public/image/b4.png作为去logo和去水印前的图片，将public/image/a4.png作为去logo和去水印后的图片。
+将public/image/b5.png作为去logo和去水印前的图片，将public/image/a5.png作为去logo和去水印后的图片。
+将public/image/b6.png作为去logo和去水印前的图片，将public/image/a6.png作为去logo和去水印后的图片。
+将public/image/b7.png作为去logo和去水印前的图片，将public/image/a7.png作为去logo和去水印后的图片。
