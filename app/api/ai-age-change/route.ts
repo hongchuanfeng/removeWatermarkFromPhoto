@@ -153,7 +153,7 @@ function uploadToCOS(key: string, data: Buffer): Promise<any> {
 }
 
 // 调用腾讯云AI年龄变换API（数据万象人脸特效接口）
-async function callTencentAgeChangeAPI(inputKey: string, outputKey: string, age: number) {
+async function callTencentAgeChangeAPI(inputKey: string, outputKey: string, age: number): Promise<{ ResultImage: string }> {
   // 使用COS SDK生成签名URL，这样更可靠（参考remove-watermark的实现）
   const queryString = `ci-process=face-effect&type=face-age-transformation&age=${age}`
 
@@ -165,7 +165,7 @@ async function callTencentAgeChangeAPI(inputKey: string, outputKey: string, age:
     queryString
   })
 
-  return new Promise((resolve, reject) => {
+  return new Promise<{ ResultImage: string }>((resolve, reject) => {
     cos.getObjectUrl({
       Bucket: BUCKET,
       Region: REGION,

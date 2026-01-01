@@ -160,7 +160,7 @@ function uploadToCOS(key: string, data: Buffer): Promise<any> {
 }
 
 // 调用腾讯云AI美颜API（数据万象人脸特效接口）
-async function callTencentFaceBeautifyAPI(inputKey: string, outputKey: string, whitening: number, skinSmooth: number, faceSlim: number, eyeEnlarge: number) {
+async function callTencentFaceBeautifyAPI(inputKey: string, outputKey: string, whitening: number, skinSmooth: number, faceSlim: number, eyeEnlarge: number): Promise<{ ResultImage: string; OutputUrl?: string }> {
   // 使用COS SDK生成签名URL，这样更可靠（参考remove-watermark和ai-age-change的实现）
   const queryString = `ci-process=face-effect&type=face-beautify&whitening=${whitening}&smoothing=${skinSmooth}&face-slim=${faceSlim}&eye-enlarge=${eyeEnlarge}`
 
@@ -175,7 +175,7 @@ async function callTencentFaceBeautifyAPI(inputKey: string, outputKey: string, w
     queryString
   })
 
-  return new Promise((resolve, reject) => {
+  return new Promise<{ ResultImage: string; OutputUrl?: string }>((resolve, reject) => {
     const getObjectUrlParams = {
       Bucket: BUCKET,
       Region: REGION,

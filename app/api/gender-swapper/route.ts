@@ -138,7 +138,7 @@ function uploadToCOS(key: string, data: Buffer): Promise<any> {
 }
 
 // 调用腾讯云AI性别转换API（数据万象人脸特效接口）
-async function callTencentGenderSwapAPI(inputKey: string, outputKey: string, targetGender: string) {
+async function callTencentGenderSwapAPI(inputKey: string, outputKey: string, targetGender: string): Promise<{ ResultImage: string; OutputUrl?: string }> {
   // 使用COS SDK生成签名URL，这样更可靠（参考remove-watermark的实现）
   const genderParam = targetGender === 'male' ? '1' : '0' // 0：男变女，1：女变男
   const queryString = `ci-process=face-effect&type=face-gender-transformation&gender=${genderParam}`
@@ -152,7 +152,7 @@ async function callTencentGenderSwapAPI(inputKey: string, outputKey: string, tar
     queryString
   })
 
-  return new Promise((resolve, reject) => {
+  return new Promise<{ ResultImage: string; OutputUrl?: string }>((resolve, reject) => {
     cos.getObjectUrl({
       Bucket: BUCKET,
       Region: REGION,
