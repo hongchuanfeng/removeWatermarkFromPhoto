@@ -14,6 +14,7 @@ export default function UseCases() {
     { id: 5, before: '/image/b5.png', after: '/image/a5.png', typeKey: 'usecases.examples.logoWatermark' },
     { id: 6, before: '/image/b6.png', after: '/image/a6.png', typeKey: 'usecases.examples.logoWatermark' },
     { id: 7, before: '/image/b7.png', after: '/image/a7.png', typeKey: 'usecases.examples.logoWatermark' },
+    { id: 8, before: '/image/b8.png', after: '/image/a8.png', typeKey: 'usecases.examples.logoWatermark' },
   ]
 
   return (
