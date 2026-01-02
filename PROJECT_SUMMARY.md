@@ -100,7 +100,7 @@ The watermark removal API route has the structure ready but needs the actual Ten
 https://cloud.tencent.com/document/product/460/79042
 
 ### Domain Configuration
-Update the domain `https://removewatermark.chdaoai.com` in:
+Update the domain `https://www.chdaoai.com` in:
 - `app/layout.tsx` (metadataBase, canonical URLs)
 - `app/sitemap.ts` (baseUrl)
 - `app/robots.ts` (sitemap URL)

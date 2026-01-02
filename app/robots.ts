@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/auth/', '/profile/'],
     },
-    sitemap: 'https://removewatermark.chdaoai.com/sitemap.xml',
+    sitemap: 'https://www.chdaoai.com/sitemap.xml',
   }
 }

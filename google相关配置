@@ -1,12 +1,12 @@
 1、添加GA 代码到所有的页面中
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7K2W5KRNQD"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HBHVQCWZT5"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-7K2W5KRNQD');
+  gtag('config', 'G-HBHVQCWZT5');
 </script>
 
 2、添加google adsense 代码到所有的页面中

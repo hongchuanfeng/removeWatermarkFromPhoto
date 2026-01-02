@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://removewatermark.chdaoai.com'),
+  metadataBase: new URL('https://www.chdaoai.com'),
   alternates: {
     canonical: '/',
     languages: {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Remove Watermark from Photo - Remove Logo Online Free',
     description: 'Remove watermark and logo from photos online. Free AI-powered watermark removal tool.',
-    url: 'https://removewatermark.chdaoai.com',
+    url: 'https://www.chdaoai.com',
     siteName: 'Remove Watermark',
     locale: 'en_US',
     type: 'website',

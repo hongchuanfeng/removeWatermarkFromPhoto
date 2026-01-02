@@ -39,7 +39,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 - **Site URL**: `http://localhost:3000` (开发环境)
 - **Redirect URLs**: 
   - `http://localhost:3000/**` (开发环境)
-  - `https://removewatermark.chdaoai.com/**` (生产环境)
+  - `https://www.chdaoai.com/**` (生产环境)
 
 ### 3. Google Cloud Console配置
 在Google Cloud Console中：

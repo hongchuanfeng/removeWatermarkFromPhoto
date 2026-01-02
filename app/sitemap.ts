@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://removewatermark.chdaoai.com'
+  const baseUrl = 'https://www.chdaoai.com'
   const locales = ['en', 'zh', 'ru', 'ar', 'de', 'ja', 'fr', 'es', 'pt', 'ko']
   const routes = [
     '',

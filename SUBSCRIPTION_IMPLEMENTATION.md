@@ -110,7 +110,7 @@ NEXT_PUBLIC_CREEM_PRODUCT_PREMIUM_ID=prod_5h3JThYd4iw4SIDm6L5sCO
      - Premium: `prod_5h3JThYd4iw4SIDm6L5sCO`
 
 2. **Webhook URL**：
-   - 在Creem后台配置webhook URL为：`https://removewatermark.chdaoai.com/api/creem/webhook`
+   - 在Creem后台配置webhook URL为：`https://www.chdaoai.com/api/creem/webhook`
 
 3. **API URL**：
    - 测试环境：`https://test-api.creem.io`

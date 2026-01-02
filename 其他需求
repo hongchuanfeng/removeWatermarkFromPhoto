@@ -150,7 +150,13 @@ ai-face-beautify页面实现其他多语言吧，多语言太多，按两个一�
 首页的订阅套餐明细请实现其他多语言啊，多语言太多，按两个一组来处理。
 
 
+ai-face-beautify页面的 上传您的照片 和 结果 两个div 高度一致，请修改
 
+profile页面中的“个人中心”标题 字体改为黑色
+
+
+
+将项目中的域名https://www.chdaoai.com/ 改为：https://www.chdaoai.com/
 
 
 

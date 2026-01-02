@@ -235,7 +235,7 @@ secret :whsec_tsf4I58EXUxebny8SvoBv
 根据上面的资料获取回调参数，然后把数据添加到supabase数据库中，表名是subscription_orders，
 
 
-回调URL：https://removewatermark.chdaoai.com/api/creem/webhook
+回调URL：https://www.chdaoai.com/api/creem/webhook
 
 
 
