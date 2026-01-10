@@ -23,6 +23,17 @@ export default function LoginPage() {
       setLoading(false)
     }
     checkUser()
+
+    // Redirect to profile when auth state indicates the user signed in (handles email sign-in)
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        router.push('/profile')
+      }
+    })
+
+    return () => {
+      authListener?.subscription?.unsubscribe?.()
+    }
   }, [supabase, router])
 
   if (loading) {
