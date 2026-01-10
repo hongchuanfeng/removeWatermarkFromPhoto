@@ -99,6 +99,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Authentication
 - Google OAuth via Supabase
+- Email/password authentication
+- Password reset functionality
 - User session management
 - Protected routes
 

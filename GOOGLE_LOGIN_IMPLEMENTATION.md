@@ -1,19 +1,29 @@
-# Google登录功能实现说明
+# 登录功能实现说明
 
 ## ✅ 已实现的功能
 
-### 1. 导航栏Google登录按钮
-在导航栏右侧添加了Google登录按钮：
+### 1. 多种登录方式支持
+项目支持以下登录方式：
+- ✅ **Google OAuth登录** - 通过Google账户快速登录
+- ✅ **邮箱密码登录** - 传统邮箱和密码登录
+- ✅ **邮箱魔法链接登录** - 无需密码，通过邮箱链接登录
+
+### 2. 导航栏登录按钮
+在导航栏右侧添加了登录选项：
 - ✅ 显示Google图标和"Google"文字
-- ✅ 点击后直接调用Google OAuth登录
+- ✅ 显示"登录"按钮链接到完整登录页面
+- ✅ 点击后直接调用对应登录方式
 - ✅ 登录成功后自动跳转到首页
-- ✅ 未登录时显示Google按钮和普通登录按钮
+- ✅ 未登录时显示登录按钮，已登录时显示用户信息和退出按钮
 
 ### 2. 登录页面
 `/auth/login` 页面已配置：
 - ✅ 使用Supabase Auth UI组件
 - ✅ 支持Google OAuth登录
+- ✅ 支持邮箱密码登录（强制要求密码）
+- ✅ 支持密码重置功能
 - ✅ 自动检测已登录用户并跳转
+- ✅ 多语言支持
 
 ### 3. 环境变量配置
 需要在 `.env.local` 文件中配置：
@@ -26,7 +36,12 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 
 ## 🔧 Supabase配置
 
-### 1. 启用Google Provider
+### 1. 邮箱登录配置
+邮箱登录是Supabase Auth的默认功能：
+- ✅ 邮箱密码登录 - 强制要求输入密码进行注册和登录
+- ✅ 密码重置功能 - 支持忘记密码时通过邮箱重置
+
+### 2. 启用Google Provider
 在Supabase Dashboard中：
 1. 进入 **Authentication** > **Providers**
 2. 找到 **Google** 并启用
@@ -51,12 +66,12 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 ## 📋 使用流程
 
 ### 用户登录流程
-1. 用户点击导航栏的"Google"按钮
-2. 跳转到Google登录页面
-3. 用户授权后，Google重定向回Supabase
-4. Supabase处理OAuth回调
-5. 用户被重定向回网站首页
-6. 导航栏显示用户信息和退出按钮
+1. 用户点击导航栏的"Google"按钮或访问登录页面
+2. 跳转到Google登录页面或显示邮箱登录表单
+3. 用户授权后，Google重定向回Supabase，或用户完成邮箱登录
+4. Supabase处理OAuth回调或验证邮箱密码
+5. 用户被重定向到个人中心页面
+6. 个人中心页面显示用户信息和账户管理选项
 
 ### 代码实现
 
@@ -113,8 +128,9 @@ const handleGoogleLogin = async () => {
 - [ ] 在Supabase Dashboard启用Google Provider
 - [ ] 配置Google OAuth凭据
 - [ ] 设置正确的重定向URL
-- [ ] 测试Google登录流程
-- [ ] 验证登录后用户信息显示
+- [ ] 测试Google登录流程（跳转到个人中心）
+- [ ] 测试邮箱密码登录流程（跳转到个人中心）
+- [ ] 验证个人中心页面用户信息显示
 - [ ] 测试退出登录功能
 
 ## 🐛 常见问题
