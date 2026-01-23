@@ -84,6 +84,14 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
           <p>&copy; {new Date().getFullYear()} RemoveWatermark. All rights reserved.</p>
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition mt-2 inline-block"
+          >
+            工业和信息化部 粤ICP备18041392号-5
+          </a>
         </div>
       </div>
     </footer>
