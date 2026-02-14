@@ -3,15 +3,21 @@
 import Link from 'next/link'
 import { useLanguage } from '@/contexts/LanguageContext'
 
+// 辅助函数：获取带语言前缀的路径
+const getLangPath = (path: string, lang: string): string => {
+  if (path === '/') return `/${lang}`
+  return `/${lang}${path}`
+}
+
 export default function Footer() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4">RemoveWatermark</h3>
+            <h3 className="text-white text-lg font-semibold mb-4">chdaoai</h3>
             <p className="text-sm">
               Professional AI-powered watermark and logo removal service.
             </p>
@@ -20,22 +26,22 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/privacy-policy" className="hover:text-white transition">
+                <Link href={getLangPath('/privacy-policy', language)} className="hover:text-white transition">
                   {t('footer.privacy')}
                 </Link>
               </li>
               <li>
-                <Link href="/terms-of-service" className="hover:text-white transition">
+                <Link href={getLangPath('/terms-of-service', language)} className="hover:text-white transition">
                   {t('footer.terms')}
                 </Link>
               </li>
               <li>
-                <Link href="/refund-policy" className="hover:text-white transition">
+                <Link href={getLangPath('/refund-policy', language)} className="hover:text-white transition">
                   {t('footer.refund')}
                 </Link>
               </li>
               <li>
-                <Link href="/disclaimer" className="hover:text-white transition">
+                <Link href={getLangPath('/disclaimer', language)} className="hover:text-white transition">
                   {t('footer.disclaimer')}
                 </Link>
               </li>
@@ -45,22 +51,22 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">More</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/copyright" className="hover:text-white transition">
+                <Link href={getLangPath('/copyright', language)} className="hover:text-white transition">
                   {t('footer.copyright')}
                 </Link>
               </li>
               <li>
-                <Link href="/legal-notice" className="hover:text-white transition">
+                <Link href={getLangPath('/legal-notice', language)} className="hover:text-white transition">
                   {t('footer.legal')}
                 </Link>
               </li>
               <li>
-                <Link href="/intellectual-property" className="hover:text-white transition">
+                <Link href={getLangPath('/intellectual-property', language)} className="hover:text-white transition">
                   {t('footer.ip')}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition">
+                <Link href={getLangPath('/contact', language)} className="hover:text-white transition">
                   {t('footer.contact')}
                 </Link>
               </li>
@@ -83,7 +89,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} RemoveWatermark. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} chdaoai. All rights reserved.</p>
           <a
             href="https://beian.miit.gov.cn/"
             target="_blank"

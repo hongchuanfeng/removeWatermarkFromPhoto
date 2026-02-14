@@ -31,7 +31,7 @@ export default function Hero() {
               onClick={() => router.push('/subscribe')}
               className="bg-white/20 backdrop-blur-sm text-white border-2 border-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/30 transition shadow-lg"
             >
-              Subscribe Now
+              {t('hero.subscribe')}
             </button>
           </div>
         </div>

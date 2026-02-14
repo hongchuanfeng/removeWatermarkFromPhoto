@@ -1,11 +1,10 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function CTA() {
-  const { t } = useLanguage()
-  const router = useRouter()
+  const { t, language } = useLanguage()
 
   return (
     <section className="py-20 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
@@ -17,18 +16,18 @@ export default function CTA() {
           {t('cta.subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={() => router.push('/remove-watermark')}
-            className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-50 transition shadow-lg"
+          <Link
+            href={`/${language}/remove-watermark`}
+            className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-50 transition shadow-lg inline-block"
           >
             {t('hero.cta')}
-          </button>
-          <button
-            onClick={() => router.push('/subscribe')}
-            className="bg-primary-500 text-white border-2 border-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-400 transition shadow-lg"
+          </Link>
+          <Link
+            href={`/${language}/subscribe`}
+            className="bg-primary-500 text-white border-2 border-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-400 transition shadow-lg inline-block"
           >
             {t('cta.subscribe')}
-          </button>
+          </Link>
         </div>
       </div>
     </section>

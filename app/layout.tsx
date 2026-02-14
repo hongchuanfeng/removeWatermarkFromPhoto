@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -92,11 +90,9 @@ export default function RootLayout({
         />
         
         <LanguageProvider>
-          <Navbar />
           <main className="min-h-screen">
             {children}
           </main>
-          <Footer />
         </LanguageProvider>
       </body>
     </html>

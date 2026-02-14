@@ -103,12 +103,15 @@ gender-swapper页面的没有登录时，不要弹窗提示，直接显示在页
 
 gender-swapper页面的签名改为跟首页一样的，然后把接口的前后参数都打印出来。
 
+Gender Swapper 添加示例展示：
 
 将public/gender/b1.png作为Gender Swapper前的图片，将public/gender/a1.png作为Gender Swapper后的图片，示例1，
 
 将public/gender/b2.png作为Gender Swapper前的图片，将public/gender/a2.png作为Gender Swapper后的图片，示例2，
 
 将public/gender/b3.png作为Gender Swapper前的图片，将public/gender/a3.png作为Gender Swapper后的图片，示例3.
+
+要实现多语言功能。
 
 
 
@@ -128,7 +131,7 @@ ai-face-beautify页面的没有登录时，不要弹窗提示，直接显示在�
 ai-face-beautify页面的签名改为跟首页一样的，然后把接口的前后参数都打印出来。
 
 
-
+AI Face Beautify 添加示例展示：
 
 将public/face/b1.png作为AI Face Beautify前的图片，将public/face/a1.png作为AI Face Beautify后的图片，示例1，
 
@@ -136,7 +139,7 @@ ai-face-beautify页面的签名改为跟首页一样的，然后把接口的前�
 
 将public/face/b3.png作为AI Face Beautify前的图片，将public/face/a3.png作为AI Face Beautify后的图片，示例3.
 
-
+要实现多语言功能。
 
 
 ai-face-beautify页面实现其他多语言吧，多语言太多，按两个一组来处理。
