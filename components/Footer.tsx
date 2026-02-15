@@ -15,7 +15,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           <div>
             <h3 className="text-white text-lg font-semibold mb-4">chdaoai</h3>
             <p className="text-sm">
@@ -84,6 +84,46 @@ export default function Footer() {
               <li>
                 <span className="font-medium">{t('footer.address')}:</span>{' '}
                 {t('footer.address.value')}
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-semibold mb-4">{t('footer.friendship') || 'Friendship Links'}</h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="https://mosaic.chdaoai.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link1')}
+                </a>
+              </li>
+              <li>
+                <a href="https://www.icebreakgame.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link2')}
+                </a>
+              </li>
+              <li>
+                <a href="https://www.removewatermarker.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link3')}
+                </a>
+              </li>
+              <li>
+                <a href="https://pdf.chdaoai.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link4')}
+                </a>
+              </li>
+              <li>
+                <a href="https://qrcode.chdaoai.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link5')}
+                </a>
+              </li>
+              <li>
+                <a href="https://www.zorezoro.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link6')}
+                </a>
+              </li>
+              <li>
+                <a href="https://video2txt.zorezoro.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+                  {t('footer.friendship.link7')}
+                </a>
               </li>
             </ul>
           </div>

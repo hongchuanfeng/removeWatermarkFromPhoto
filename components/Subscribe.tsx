@@ -164,6 +164,126 @@ export default function Subscribe() {
             </div>
           </div>
         </div>
+
+        {/* Credit Usage Guide */}
+        <div className="mt-20 max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
+            {t('subscription.credits.title') || 'How Credits Work'}
+          </h2>
+          <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-primary-600 font-bold">1</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {t('subscription.credits.what.title') || 'What are credits?'}
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    {t('subscription.credits.what.desc') || 'Credits are the currency used to process images on our platform. Each image processing operation consumes credits based on the complexity of the task.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-primary-600 font-bold">2</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {t('subscription.credits.usage.title') || 'How are credits used?'}
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    {t('subscription.credits.usage.desc') || 'Each watermark removal or AI processing task uses 1-5 credits depending on the image size and complexity. Higher quality output requires more credits.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-primary-600 font-bold">3</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {t('subscription.credits.unused.title') || 'What happens to unused credits?'}
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    {t('subscription.credits.unused.desc') || 'Unused credits from your monthly subscription will expire at the end of each billing cycle and do not roll over to the next month.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-primary-600 font-bold">4</span>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {t('subscription.credits.purchase.title') || 'Can I purchase additional credits?'}
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    {t('subscription.credits.purchase.desc') || 'Yes, you can purchase additional credits at any time. Visit your profile page or contact support for more information on credit packages.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-20 max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
+            {t('subscription.faq.title') || 'Frequently Asked Questions'}
+          </h2>
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('subscription.faq.q1') || 'What are credits?'}
+              </h3>
+              <p className="text-gray-600">
+                {t('subscription.faq.a1') || 'Credits are the currency used to process images on our platform. Each watermark removal operation consumes 1 credit. You can earn credits by subscribing to our plans or through special promotions.'}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('subscription.faq.q2') || 'Do I need to register to use RemoveWatermark to remove watermarks?'}
+              </h3>
+              <p className="text-gray-600">
+                {t('subscription.faq.a2') || 'Yes, registration is required to use our service. This allows us to track your credits, save your processing history, and provide you with a better user experience.'}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('subscription.faq.q3') || 'Is RemoveWatermark free?'}
+              </h3>
+              <p className="text-gray-600">
+                {t('subscription.faq.a3') || 'New users receive 5 free credits upon registration. After using these free credits, you can subscribe to one of our affordable plans to continue using the service.'}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('subscription.faq.q4') || 'Should I choose pay-as-you-go credits or a subscription plan?'}
+              </h3>
+              <p className="text-gray-600">
+                {t('subscription.faq.a4') || 'Subscription plans offer better value with more credits per dollar. If you need to process images regularly, a subscription plan is recommended. Pay-as-you-go credits are ideal for occasional users.'}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('subscription.faq.q5') || 'What if I\'m not satisfied with the results?'}
+              </h3>
+              <p className="text-gray-600">
+                {t('subscription.faq.a5') || 'We strive to provide high-quality results. If you\'re not satisfied, please contact our support team at support@chdaoai.com and we\'ll do our best to help you. However, credits used for processing cannot be refunded.'}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t('subscription.faq.q6') || 'What if I run out of credit limit?'}
+              </h3>
+              <p className="text-gray-600">
+                {t('subscription.faq.a6') || 'If you run out of credits, you can purchase additional credits or upgrade to a higher subscription plan. You can also wait for your monthly credits to reset if you\'re on a subscription plan.'}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

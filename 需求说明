@@ -190,3 +190,20 @@ Welcome Back ,改为登录，添加忘记密码和注册两个功能。
 
 
 AI 变龄效果展示，要实现多语言功能，图片大小都改为一致的，请修改
+
+
+
+
+在首页的底部的More后面加一列友情链接：
+1、免费图片处理：https://mosaic.chdaoai.com/
+2、iceBreakGame：https://www.icebreakgame.com/
+3、视频去水印：https://www.removewatermarker.com/
+4、PDF转换工具：https://pdf.chdaoai.com/
+5、在线生成二维码：https://qrcode.chdaoai.com/
+6、NBA趣事：https://www.zorezoro.com/
+7、视频转文字：https://video2txt.zorezoro.com/
+
+友情链接实现多语言功能。
+
+
+subscribe 页面后面在加上常见问题和积分使用说明，要实现多语言功能
