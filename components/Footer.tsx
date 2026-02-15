@@ -85,6 +85,11 @@ export default function Footer() {
                 <span className="font-medium">{t('footer.address')}:</span>{' '}
                 {t('footer.address.value')}
               </li>
+              <li>
+                <Link href={getLangPath('/about', language)} className="hover:text-white transition">
+                  {t('nav.about')}
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
