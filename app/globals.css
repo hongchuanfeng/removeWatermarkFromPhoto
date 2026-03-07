@@ -32,6 +32,22 @@ body {
   }
 }
 
+/* Override Tailwind text-sm */
+.text-sm {
+  font-size: .875rem;
+  line-height: 1.25rem;
+}
+
+/* Override Tailwind px-2 */
+.px-2 {
+  padding-right: 0.1rem;
+}
+
+/* Override md:space-x-4 to use 0.5rem spacing */
+.md\:space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-right: calc(1rem * var(--tw-space-x-reverse)) !important;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

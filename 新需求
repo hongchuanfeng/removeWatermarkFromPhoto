@@ -1,0 +1,248 @@
+将"AI变龄"、"性别转换"、"AI美颜" 这三个菜单一起放到“图片工具”菜单下面的二级菜单里面，
+就是导航栏：首页、图片工具、订阅，然后点击“图片工具” 显示二级菜单，请修改这个。
+
+在图片工具 然后再加上一个“视频工具”，
+它下面有四个菜单：视频去水印、视频转文字、视频转语音，旧片修复，先把这四个页面生成出来，功能可以先不实现。
+对应的页面要加上 功能说明、使用帮助、案例展示、常见问题，要实现多语言功能。
+
+
+视频工具 要跟 图片工具 都是一级菜单，明白我的意思吗，请重新修改。
+
+
+/video-watermark-removal 这个页面的案例图片是
+public/video/watermark/1.jpg,
+public/video/watermark/2.jpg,
+public/video/watermark/3.jpg,
+
+请修改下，然后实现多语言功能。
+
+
+
+/video-to-text 这个页面的案例图片是
+public/video/text/1.jpg,
+public/video/text/2.jpg,
+public/video/text/3.jpg,
+
+请修改下，然后实现多语言功能。
+
+
+
+/video-to-speech 这个页面的案例图片是
+public/video/speech/1.jpg,
+public/video/speech/2.jpg,
+public/video/speech/3.jpg,
+
+请修改下，然后实现多语言功能。
+
+
+
+
+/video-to-speech  除了中文与英文之外，其他都语言没实现，请好好检查下，然后实现多语言功能。
+
+
+
+
+/old-video-restoration 这个页面的案例图片是
+public/video/old/1.jpg,
+public/video/old/2.jpg,
+public/video/old/3.jpg,
+
+请修改下，然后实现多语言功能。
+
+
+葡萄牙语
+
+
+
+
+在视频工具 然后再加上一个“音频工具”，是一级菜单。
+它下面有六个菜单：音频剪辑合并、格式转换、人声分离，音频转文字，音频转字幕，音频修复，
+先把这六个页面生成出来，功能可以先不实现。
+对应的页面要加上 功能说明、使用帮助、案例展示、常见问题，要实现多语言功能。
+
+
+
+
+在音频工具 然后再加上一个“字幕工具”，是一级菜单。
+它下面有五个菜单：文字转字幕、字幕转文字、格式转化，字幕翻译，字幕合并，先把这五个页面生成出来，功能可以先不实现。
+对应的页面要加上 功能说明、使用帮助、案例展示、常见问题，要实现多语言功能。
+
+
+当鼠标移动一级菜单时候，显示二级菜单，其他的二级菜单要隐藏，明白我的意思吗，请修改这个。
+
+
+/text-to-subtitles，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+/text-to-subtitles 这个页面的示例图片是
+public/subtitles/text/1.jpg,
+public/subtitles/text/2.jpg,
+public/subtitles/text/3.jpg,
+
+
+/subtitles-to-text ，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+/subtitle-format-conversion，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+/subtitle-format-conversion这个页面的示例图片是
+public/subtitles/conversion/1.jpg,
+public/subtitles/conversion/2.jpg,
+public/subtitles/conversion/3.jpg,
+
+
+/subtitle-translation，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+/subtitle-translation ，这个页面的示例图片是
+public/subtitles/translation/1.jpg,
+public/subtitles/translation/2.jpg,
+public/subtitles/translation/3.jpg,
+
+
+/subtitle-merge，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+
+/subtitle-merge，这个页面的示例图片是
+public/subtitles/merge/1.jpg,
+public/subtitles/merge/2.jpg,
+public/subtitles/merge/3.jpg,
+
+
+
+/subtitles-to-text这个页面的示例图片是
+public/subtitles/totext/1.jpg,
+public/subtitles/totext/2.jpg,
+public/subtitles/totext/3.jpg,
+
+/audio-clip-merge 这个页面的示例图片是
+public/audio/merge/1.jpg,
+public/audio/merge/2.jpg,
+public/audio/merge/3.jpg,
+
+
+/audio-format-conversion 这个页面的示例图片是
+public/audio/conversion/1.jpg,
+public/audio/conversion/2.jpg,
+public/audio/conversion/3.jpg,
+
+
+/vocal-separation 这个页面的示例图片是
+public/audio/separation/1.jpg,
+public/audio/separation/2.jpg,
+public/audio/separation/3.jpg,
+
+
+
+/audio-to-text 这个页面的示例图片是
+public/audio/text/1.jpg,
+public/audio/text/2.jpg,
+public/audio/text/3.jpg,
+
+
+/audio-to-subtitles 这个页面的示例图片是
+public/audio/subtitles/1.jpg,
+public/audio/subtitles/2.jpg,
+public/audio/subtitles/3.jpg,
+
+
+
+/audio-repair 这个页面的示例图片是
+public/audio/repair/1.jpg,
+public/audio/repair/2.jpg,
+public/audio/repair/3.jpg,
+
+
+
+
+在字幕工具 然后再加上一个“PDF工具”，是一级菜单。
+PDF工具二级菜单：
+1、PDF合并
+2、PDF拆分
+3、PDF去重
+4、PDF转换
+5、PDF转语音
+6、PDF转文字
+7、PDF转字幕
+8、PDF转翻译
+对应的页面要加上 功能说明、使用帮助、案例展示、常见问题，要实现多语言功能。
+
+
+/pdf-merge，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+/pdf-merge， 这个页面的示例图片是
+public/pdf/merge/1.jpg,
+public/pdf/merge/2.jpg,
+public/pdf/merge/3.jpg,
+
+
+/pdf-split，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+
+/pdf-deduplicate，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+
+/pdf-convert，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+
+/pdf-to-audio，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+/pdf-to-audio， 这个页面的示例图片是
+public/pdf/audio/1.jpg,
+public/pdf/audio/2.jpg,
+public/pdf/audio/3.jpg,
+
+
+/pdf-to-text，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+public/pdf/text/1.jpg,
+public/pdf/text/2.jpg,
+public/pdf/text/3.jpg,
+
+/pdf-to-subtitles，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+
+/pdf-translate，这个页面实现多语言功能，除了中文与英文之外，其他都要实现。
+
+
+在PDF工具 然后再加上一个“CSV工具”，是一级菜单。
+CSV工具二级菜单：
+1、CSV合并
+2、CSV拆分
+3、CSV去重
+对应的页面要加上 功能说明、使用帮助、案例展示、常见问题，要实现多语言功能。
+
+
+
+在CSV工具 然后再加上一个“电子书工具”，是一级菜单。
+电子书工具二级菜单：
+1、电子书合并   
+2、电子书去除水印
+3、电子书转语音
+4、电子书生成字幕
+5、电子书格式转换
+对应的页面要加上 功能说明、使用帮助、案例展示、常见问题，要实现多语言功能。
+
+
+
+将CSV工具与电子书工具合并，改为“其他工具”，是一级菜单。
+其他工具二级菜单：
+1）CSV工具
+1、CSV合并
+2、CSV拆分
+3、CSV去重
+2) 电子书工具
+1、电子书合并   
+2、电子书去除水印
+3、电子书转语音
+4、电子书生成字幕
+5、电子书格式转换
+
+
+把PDF工具也放到其他工具里面把，作为二级菜单，请修改

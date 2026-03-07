@@ -11,6 +11,24 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [mobileOpen, setMobileOpen] = useState<boolean>(false)
   const [loading, setLoading] = useState(false)
+  const [activeMenu, setActiveMenu] = useState<string | null>(null)
+
+  // 鼠标进入一级菜单时显示对应的二级菜单
+  const handleMenuEnter = (menu: string) => {
+    setActiveMenu(menu)
+  }
+
+  // 鼠标离开时隐藏所有二级菜单
+  const handleMenuLeave = () => {
+    setActiveMenu(null)
+  }
+  const [mobileImageToolsOpen, setMobileImageToolsOpen] = useState(false)
+  const [mobileVideoToolsOpen, setMobileVideoToolsOpen] = useState(false)
+  const [mobileAudioToolsOpen, setMobileAudioToolsOpen] = useState(false)
+  const [mobileSubtitleToolsOpen, setMobileSubtitleToolsOpen] = useState(false)
+  const [mobilePdfToolsOpen, setMobilePdfToolsOpen] = useState(false)
+  const [mobileCsvToolsOpen, setMobileCsvToolsOpen] = useState(false)
+  const [mobileOtherToolsOpen, setMobileOtherToolsOpen] = useState(false)
   const supabase = createClientComponentClient()
   const router = useRouter()
 
@@ -65,18 +83,6 @@ export default function Navbar() {
     router.push('/')
   }
 
-  const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/${language}/profile` : '/profile',
-      },
-    })
-    if (error) {
-      console.error('Error signing in with Google:', error)
-    }
-  }
-
   const handleLanguageChange = (newLang: string) => {
     console.log('[DEBUG] handleLanguageChange called, newLang:', newLang)
     
@@ -110,19 +116,402 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop links */}
-            <div className="hidden md:ml-10 md:flex md:space-x-4">
+            <div className="hidden md:ml-10 md:flex md:space-x-2">
               <Link href={getLangPath('/', language)} className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap">
                 {t('nav.home')}
               </Link>
-              <Link href={getLangPath('/ai-age-change', language)} className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap">
-                {t('nav.ai_age_change')}
-              </Link>
-              <Link href={getLangPath('/gender-swapper', language)} className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap">
-                {t('nav.gender_swapper')}
-              </Link>
-              <Link href={getLangPath('/ai-face-beautify', language)} className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap">
-                {t('nav.ai_face_beautify')}
-              </Link>
+              
+              {/* Image Tools Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => handleMenuEnter(activeMenu === 'image' ? null : 'image')}
+                  onMouseEnter={() => handleMenuEnter('image')}
+                  onMouseLeave={handleMenuLeave}
+                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
+                >
+                  {t('nav.image_tools')}
+                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'image' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Dropdown Menu */}
+                {activeMenu === 'image' && (
+                  <div 
+                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    onMouseEnter={() => handleMenuEnter('image')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    {/* Image Tools */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.image_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/ai-age-change', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ai_age_change')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/gender-swapper', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.gender_swapper')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/ai-face-beautify', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ai_face_beautify')}
+                    </Link>
+                  </div>
+                )}
+              </div>
+                    
+              {/* Video Tools Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => handleMenuEnter(activeMenu === 'video' ? null : 'video')}
+                  onMouseEnter={() => handleMenuEnter('video')}
+                  onMouseLeave={handleMenuLeave}
+                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
+                >
+                  {t('nav.video_tools')}
+                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'video' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Video Tools Dropdown Menu */}
+                {activeMenu === 'video' && (
+                  <div 
+                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    onMouseEnter={() => handleMenuEnter('video')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    {/* Video Tools */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.video_tools')}
+                    </div>
+                          <Link 
+                            href={getLangPath('/video-watermark-removal', language)} 
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                          >
+                            {t('nav.video_watermark_removal')}
+                          </Link>
+                          <Link 
+                            href={getLangPath('/video-to-text', language)} 
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                          >
+                            {t('nav.video_to_text')}
+                          </Link>
+                          <Link 
+                            href={getLangPath('/video-to-speech', language)} 
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                          >
+                            {t('nav.video_to_speech')}
+                          </Link>
+                          <Link 
+                            href={getLangPath('/old-video-restoration', language)} 
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                          >
+                            {t('nav.old_video_restoration')}
+                          </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Audio Tools Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => handleMenuEnter(activeMenu === 'audio' ? null : 'audio')}
+                  onMouseEnter={() => handleMenuEnter('audio')}
+                  onMouseLeave={handleMenuLeave}
+                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
+                >
+                  {t('nav.audio_tools')}
+                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'audio' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Audio Tools Dropdown Menu */}
+                {activeMenu === 'audio' && (
+                  <div 
+                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    onMouseEnter={() => handleMenuEnter('audio')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.audio_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/audio-clip-merge', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.audio_clip_merge')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/audio-format-conversion', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.audio_format_conversion')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/vocal-separation', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.vocal_separation')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/audio-to-text', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.audio_to_text')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/audio-to-subtitles', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.audio_to_subtitles')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/audio-repair', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.audio_repair')}
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Subtitle Tools Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => handleMenuEnter(activeMenu === 'subtitle' ? null : 'subtitle')}
+                  onMouseEnter={() => handleMenuEnter('subtitle')}
+                  onMouseLeave={handleMenuLeave}
+                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
+                >
+                  {t('nav.subtitle_tools')}
+                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'subtitle' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Subtitle Tools Dropdown Menu */}
+                {activeMenu === 'subtitle' && (
+                  <div 
+                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    onMouseEnter={() => handleMenuEnter('subtitle')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.subtitle_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/text-to-subtitles', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.text_to_subtitles')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/subtitles-to-text', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.subtitles_to_text')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/subtitle-format-conversion', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.subtitle_format_conversion')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/subtitle-translation', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.subtitle_translation')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/subtitle-merge', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.subtitle_merge')}
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Other Tools Dropdown - CSV & eBook & PDF */}
+              <div className="relative">
+                <button
+                  onClick={() => handleMenuEnter(activeMenu === 'other' ? null : 'other')}
+                  onMouseEnter={() => handleMenuEnter('other')}
+                  onMouseLeave={handleMenuLeave}
+                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
+                >
+                  {t('nav.other_tools')}
+                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'other' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Other Tools Dropdown Menu */}
+                {activeMenu === 'other' && (
+                  <div 
+                    className="absolute left-0 mt-0 w-72 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    onMouseEnter={() => handleMenuEnter('other')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    {/* CSV Tools Section */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.csv_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/csv-merge', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.csv_merge')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/csv-split', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.csv_split')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/csv-deduplicate', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.csv_deduplicate')}
+                    </Link>
+                    
+                    {/* eBook Tools Section */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.ebook_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/ebook-merge', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ebook_merge')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/ebook-watermark-removal', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ebook_watermark_removal')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/ebook-to-speech', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ebook_to_speech')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/ebook-subtitles', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ebook_subtitles')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/ebook-format-conversion', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ebook_format_conversion')}
+                    </Link>
+                    
+                    {/* PDF Tools Section */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.pdf_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/pdf-merge', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_merge')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-split', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_split')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-deduplicate', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_deduplicate')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-convert', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_convert')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-to-audio', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_to_audio')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-to-text', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_to_text')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-to-subtitles', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_to_subtitles')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/pdf-translate', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.pdf_translate')}
+                    </Link>
+                  </div>
+                )}
+              </div> 
+              
               <Link href={getLangPath('/subscribe', language)} className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap">
                 {t('nav.subscribe')}
               </Link>
@@ -139,7 +528,7 @@ export default function Navbar() {
                   console.log('[DEBUG] select onChange triggered, value:', e.target.value)
                   handleLanguageChange(e.target.value)
                 }}
-                className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer min-w-[120px]"
+                className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer w-20"
                 style={{ color: '#111827' }}
               >
                 <option value="en" style={{ color: '#111827', backgroundColor: '#ffffff' }}>English</option>
@@ -200,21 +589,9 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleGoogleLogin}
-                    className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                    </svg>
-                    <span>Google</span>
-                  </button>
                   <Link
                     href={getLangPath('/auth/login', language)}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 transition"
+                    className="bg-primary-600 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-primary-700 transition"
                   >
                     {t('nav.login')}
                   </Link>
@@ -232,15 +609,227 @@ export default function Navbar() {
             <Link href={getLangPath('/', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
               {t('nav.home')}
             </Link>
-            <Link href={getLangPath('/ai-age-change', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-              {t('nav.ai_age_change')}
-            </Link>
-            <Link href={getLangPath('/gender-swapper', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-              {t('nav.gender_swapper')}
-            </Link>
-            <Link href={getLangPath('/ai-face-beautify', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-              {t('nav.ai_face_beautify')}
-            </Link>
+            
+            {/* Mobile Image Tools Dropdown */}
+            <div>
+              <button 
+                onClick={() => setMobileImageToolsOpen(!mobileImageToolsOpen)}
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+              >
+                {t('nav.image_tools')}
+                <svg className={`h-4 w-4 transition-transform ${mobileImageToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {mobileImageToolsOpen && (
+                <div className="pl-4 space-y-1">
+                  {/* Image Tools */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                    {t('nav.image_tools')}
+                  </div>
+                  <Link href={getLangPath('/ai-age-change', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ai_age_change')}
+                  </Link>
+                  <Link href={getLangPath('/gender-swapper', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.gender_swapper')}
+                  </Link>
+                  <Link href={getLangPath('/ai-face-beautify', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ai_face_beautify')}
+                  </Link>
+                </div>
+              )}
+            </div>
+                  
+            {/* Mobile Video Tools Dropdown */}
+            <div>
+                    <button 
+                      onClick={() => setMobileVideoToolsOpen(!mobileVideoToolsOpen)}
+                      className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+                    >
+                      {t('nav.video_tools')}
+                      <svg className={`h-4 w-4 transition-transform ${mobileVideoToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {mobileVideoToolsOpen && (
+                      <div className="pl-4 space-y-1">
+                  {/* Video Tools */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                    {t('nav.video_tools')}
+                  </div>
+                        <Link href={getLangPath('/video-watermark-removal', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                          {t('nav.video_watermark_removal')}
+                        </Link>
+                        <Link href={getLangPath('/video-to-text', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                          {t('nav.video_to_text')}
+                        </Link>
+                        <Link href={getLangPath('/video-to-speech', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                          {t('nav.video_to_speech')}
+                        </Link>
+                        <Link href={getLangPath('/old-video-restoration', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                          {t('nav.old_video_restoration')}
+                        </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Audio Tools Dropdown */}
+            <div>
+              <button 
+                onClick={() => setMobileAudioToolsOpen(!mobileAudioToolsOpen)}
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+              >
+                {t('nav.audio_tools')}
+                <svg className={`h-4 w-4 transition-transform ${mobileAudioToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {mobileAudioToolsOpen && (
+                <div className="pl-4 space-y-1">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                    {t('nav.audio_tools')}
+                  </div>
+                  <Link href={getLangPath('/audio-clip-merge', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.audio_clip_merge')}
+                  </Link>
+                  <Link href={getLangPath('/audio-format-conversion', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.audio_format_conversion')}
+                  </Link>
+                  <Link href={getLangPath('/vocal-separation', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.vocal_separation')}
+                  </Link>
+                  <Link href={getLangPath('/audio-to-text', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.audio_to_text')}
+                  </Link>
+                  <Link href={getLangPath('/audio-to-subtitles', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.audio_to_subtitles')}
+                  </Link>
+                  <Link href={getLangPath('/audio-repair', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.audio_repair')}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Subtitle Tools Dropdown */}
+            <div>
+              <button 
+                onClick={() => setMobileSubtitleToolsOpen(!mobileSubtitleToolsOpen)}
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+              >
+                {t('nav.subtitle_tools')}
+                <svg className={`h-4 w-4 transition-transform ${mobileSubtitleToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {mobileSubtitleToolsOpen && (
+                <div className="pl-4 space-y-1">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                    {t('nav.subtitle_tools')}
+                  </div>
+                  <Link href={getLangPath('/text-to-subtitles', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.text_to_subtitles')}
+                  </Link>
+                  <Link href={getLangPath('/subtitles-to-text', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.subtitles_to_text')}
+                  </Link>
+                  <Link href={getLangPath('/subtitle-format-conversion', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.subtitle_format_conversion')}
+                  </Link>
+                  <Link href={getLangPath('/subtitle-translation', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.subtitle_translation')}
+                  </Link>
+                  <Link href={getLangPath('/subtitle-merge', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.subtitle_merge')}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Other Tools Dropdown - CSV, eBook & PDF */}
+            <div>
+              <button 
+                onClick={() => setMobileOtherToolsOpen(!mobileOtherToolsOpen)}
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+              >
+                {t('nav.other_tools')}
+                <svg className={`h-4 w-4 transition-transform ${mobileOtherToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {mobileOtherToolsOpen && (
+                <div className="pl-4 space-y-1">
+                  {/* CSV Tools Section */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                    {t('nav.csv_tools')}
+                  </div>
+                  <Link href={getLangPath('/csv-merge', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.csv_merge')}
+                  </Link>
+                  <Link href={getLangPath('/csv-split', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.csv_split')}
+                  </Link>
+                  <Link href={getLangPath('/csv-deduplicate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.csv_deduplicate')}
+                  </Link>
+                  
+                  {/* eBook Tools Section */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1 mt-2">
+                    {t('nav.ebook_tools')}
+                  </div>
+                  <Link href={getLangPath('/ebook-merge', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ebook_merge')}
+                  </Link>
+                  <Link href={getLangPath('/ebook-watermark-removal', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ebook_watermark_removal')}
+                  </Link>
+                  <Link href={getLangPath('/ebook-to-speech', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ebook_to_speech')}
+                  </Link>
+                  <Link href={getLangPath('/ebook-subtitles', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ebook_subtitles')}
+                  </Link>
+                  <Link href={getLangPath('/ebook-format-conversion', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ebook_format_conversion')}
+                  </Link>
+                  
+                  {/* PDF Tools Section */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1 mt-2">
+                    {t('nav.pdf_tools')}
+                  </div>
+                  <Link href={getLangPath('/pdf-merge', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_merge')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-split', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_split')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-deduplicate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_deduplicate')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-convert', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_convert')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-to-audio', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_to_audio')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-to-text', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_to_text')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-to-subtitles', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_to_subtitles')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-translate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_translate')}
+                  </Link>
+                </div>
+              )}
+            </div>
+            
             <Link href={getLangPath('/subscribe', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
               {t('nav.subscribe')}
             </Link>
@@ -259,9 +848,6 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <button onClick={() => { setMobileOpen(false); handleGoogleLogin(); }} className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
-                    {t('nav.login')} (Google)
-                  </button>
                   <Link href={getLangPath('/auth/login', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.login')}
                   </Link>
