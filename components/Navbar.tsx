@@ -14,7 +14,7 @@ export default function Navbar() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
 
   // 鼠标进入一级菜单时显示对应的二级菜单
-  const handleMenuEnter = (menu: string) => {
+  const handleMenuEnter = (menu: string | null) => {
     setActiveMenu(menu)
   }
 
