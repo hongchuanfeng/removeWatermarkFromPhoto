@@ -29,6 +29,7 @@ export default function Navbar() {
   const [mobilePdfToolsOpen, setMobilePdfToolsOpen] = useState(false)
   const [mobileCsvToolsOpen, setMobileCsvToolsOpen] = useState(false)
   const [mobileOtherToolsOpen, setMobileOtherToolsOpen] = useState(false)
+  const [mobileQRCodeToolsOpen, setMobileQRCodeToolsOpen] = useState(false)
   const supabase = createClientComponentClient()
   const router = useRouter()
 
@@ -138,13 +139,13 @@ export default function Navbar() {
                 {/* Dropdown Menu */}
                 {activeMenu === 'image' && (
                   <div 
-                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    className="absolute left-0 mt-0 w-80 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
                     onMouseEnter={() => handleMenuEnter('image')}
                     onMouseLeave={handleMenuLeave}
                   >
-                    {/* Image Tools */}
+                    {/* AI Image Tools */}
                     <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.image_tools')}
+                      {t('nav.ai_image_tools')}
                     </div>
                     <Link 
                       href={getLangPath('/ai-age-change', language)} 
@@ -166,6 +167,144 @@ export default function Navbar() {
                       onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                     >
                       {t('nav.ai_face_beautify')}
+                    </Link>
+
+                    {/* Image Processing Tools */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 mt-1">
+                      {t('nav.image_processing_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/image-mosaic', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.image_mosaic')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/image-compress', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.image_compress')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/image-grid', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.image_grid')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/rounded-corner', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.rounded_corner')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/remove-background', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.remove_background')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/crop-image', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.crop_image')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/grayscale', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.grayscale')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/text-to-image', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.text_to_image')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/enlarge-image', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.enlarge_image')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/change-background', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.change_background')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/image-format-conversion', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.image_format_conversion')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/add-watermark', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.add_watermark')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/merge-images', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.merge_images')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/photo-restoration', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.photo_restoration')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/rotate-image', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.rotate_image')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/ico-generator', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.ico_generator')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/add-text', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.add_text')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/colorize-image', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.colorize_image')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/view-exif', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.view_exif')}
                     </Link>
                   </div>
                 )}
@@ -228,7 +367,7 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Audio Tools Dropdown */}
+              {/* Audio & Subtitle Tools Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => handleMenuEnter(activeMenu === 'audio' ? null : 'audio')}
@@ -242,13 +381,14 @@ export default function Navbar() {
                   </svg>
                 </button>
                 
-                {/* Audio Tools Dropdown Menu */}
+                {/* Audio & Subtitle Tools Dropdown Menu */}
                 {activeMenu === 'audio' && (
                   <div 
-                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    className="absolute left-0 mt-0 w-72 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
                     onMouseEnter={() => handleMenuEnter('audio')}
                     onMouseLeave={handleMenuLeave}
                   >
+                    {/* Audio Tools Section */}
                     <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
                       {t('nav.audio_tools')}
                     </div>
@@ -294,32 +434,9 @@ export default function Navbar() {
                     >
                       {t('nav.audio_repair')}
                     </Link>
-                  </div>
-                )}
-              </div>
 
-              {/* Subtitle Tools Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => handleMenuEnter(activeMenu === 'subtitle' ? null : 'subtitle')}
-                  onMouseEnter={() => handleMenuEnter('subtitle')}
-                  onMouseLeave={handleMenuLeave}
-                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
-                >
-                  {t('nav.subtitle_tools')}
-                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'subtitle' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                
-                {/* Subtitle Tools Dropdown Menu */}
-                {activeMenu === 'subtitle' && (
-                  <div 
-                    className="absolute left-0 mt-0 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
-                    onMouseEnter={() => handleMenuEnter('subtitle')}
-                    onMouseLeave={handleMenuLeave}
-                  >
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                    {/* Subtitle Tools Section */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 mt-1">
                       {t('nav.subtitle_tools')}
                     </div>
                     <Link 
@@ -511,6 +628,68 @@ export default function Navbar() {
                   </div>
                 )}
               </div> 
+
+              {/* QR Code & Barcode Tools Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => handleMenuEnter(activeMenu === 'qrcode' ? null : 'qrcode')}
+                  onMouseEnter={() => handleMenuEnter('qrcode')}
+                  onMouseLeave={handleMenuLeave}
+                  className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap inline-flex items-center"
+                >
+                  {t('nav.qrcode_barcode_tools')}
+                  <svg className={`ml-1 h-4 w-4 transition-transform ${activeMenu === 'qrcode' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* QR Code & Barcode Tools Dropdown Menu */}
+                {activeMenu === 'qrcode' && (
+                  <div 
+                    className="absolute left-0 mt-0 w-64 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    onMouseEnter={() => handleMenuEnter('qrcode')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    {/* QR Code Section */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.qrcode_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/qrcode-generate', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.qrcode_generate')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/qrcode-recognize', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.qrcode_recognize')}
+                    </Link>
+                    
+                    {/* Barcode Section */}
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      {t('nav.barcode_tools')}
+                    </div>
+                    <Link 
+                      href={getLangPath('/barcode-generate', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.barcode_generate')}
+                    </Link>
+                    <Link 
+                      href={getLangPath('/barcode-recognize', language)} 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                    >
+                      {t('nav.barcode_recognize')}
+                    </Link>
+                  </div>
+                )}
+              </div>
               
               <Link href={getLangPath('/subscribe', language)} className="text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-medium whitespace-nowrap">
                 {t('nav.subscribe')}
@@ -624,9 +803,9 @@ export default function Navbar() {
               
               {mobileImageToolsOpen && (
                 <div className="pl-4 space-y-1">
-                  {/* Image Tools */}
+                  {/* AI Image Tools */}
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
-                    {t('nav.image_tools')}
+                    {t('nav.ai_image_tools')}
                   </div>
                   <Link href={getLangPath('/ai-age-change', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.ai_age_change')}
@@ -636,6 +815,71 @@ export default function Navbar() {
                   </Link>
                   <Link href={getLangPath('/ai-face-beautify', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.ai_face_beautify')}
+                  </Link>
+
+                  {/* Image Processing Tools */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1 mt-2">
+                    {t('nav.image_processing_tools')}
+                  </div>
+                  <Link href={getLangPath('/image-mosaic', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_mosaic')}
+                  </Link>
+                  <Link href={getLangPath('/image-compress', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_compress')}
+                  </Link>
+                  <Link href={getLangPath('/image-grid', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_grid')}
+                  </Link>
+                  <Link href={getLangPath('/rounded-corner', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.rounded_corner')}
+                  </Link>
+                  <Link href={getLangPath('/remove-background', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.remove_background')}
+                  </Link>
+                  <Link href={getLangPath('/crop-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.crop_image')}
+                  </Link>
+                  <Link href={getLangPath('/grayscale', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.grayscale')}
+                  </Link>
+                  <Link href={getLangPath('/text-to-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.text_to_image')}
+                  </Link>
+                  <Link href={getLangPath('/enlarge-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.enlarge_image')}
+                  </Link>
+                  <Link href={getLangPath('/change-background', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.change_background')}
+                  </Link>
+                  <Link href={getLangPath('/image-format-conversion', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_format_conversion')}
+                  </Link>
+                  <Link href={getLangPath('/add-watermark', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.add_watermark')}
+                  </Link>
+                  <Link href={getLangPath('/merge-images', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.merge_images')}
+                  </Link>
+                  <Link href={getLangPath('/photo-restoration', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.photo_restoration')}
+                  </Link>
+                  <Link href={getLangPath('/rotate-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.rotate_image')}
+                  </Link>
+                  <Link href={getLangPath('/ico-generator', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.ico_generator')}
+                  </Link>
+                  <Link href={getLangPath('/remove-watermark', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_watermark_removal')}
+                  </Link>
+                  <Link href={getLangPath('/add-text', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.add_text')}
+                  </Link>
+                  <Link href={getLangPath('/colorize-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.colorize_image')}
+                  </Link>
+                  <Link href={getLangPath('/view-exif', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.view_exif')}
                   </Link>
                 </div>
               )}
@@ -675,7 +919,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile Audio Tools Dropdown */}
+            {/* Mobile Audio & Subtitle Tools Dropdown */}
             <div>
               <button 
                 onClick={() => setMobileAudioToolsOpen(!mobileAudioToolsOpen)}
@@ -689,6 +933,7 @@ export default function Navbar() {
               
               {mobileAudioToolsOpen && (
                 <div className="pl-4 space-y-1">
+                  {/* Audio Tools Section */}
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
                     {t('nav.audio_tools')}
                   </div>
@@ -710,25 +955,9 @@ export default function Navbar() {
                   <Link href={getLangPath('/audio-repair', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.audio_repair')}
                   </Link>
-                </div>
-              )}
-            </div>
 
-            {/* Mobile Subtitle Tools Dropdown */}
-            <div>
-              <button 
-                onClick={() => setMobileSubtitleToolsOpen(!mobileSubtitleToolsOpen)}
-                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
-              >
-                {t('nav.subtitle_tools')}
-                <svg className={`h-4 w-4 transition-transform ${mobileSubtitleToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {mobileSubtitleToolsOpen && (
-                <div className="pl-4 space-y-1">
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                  {/* Subtitle Tools Section */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1 mt-2">
                     {t('nav.subtitle_tools')}
                   </div>
                   <Link href={getLangPath('/text-to-subtitles', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
@@ -825,6 +1054,45 @@ export default function Navbar() {
                   </Link>
                   <Link href={getLangPath('/pdf-translate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.pdf_translate')}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile QR Code & Barcode Tools Dropdown */}
+            <div>
+              <button 
+                onClick={() => setMobileQRCodeToolsOpen(!mobileQRCodeToolsOpen)}
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+              >
+                {t('nav.qrcode_barcode_tools')}
+                <svg className={`h-4 w-4 transition-transform ${mobileQRCodeToolsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {mobileQRCodeToolsOpen && (
+                <div className="pl-4 space-y-1">
+                  {/* QR Code Section */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
+                    {t('nav.qrcode_tools')}
+                  </div>
+                  <Link href={getLangPath('/qrcode-generate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.qrcode_generate')}
+                  </Link>
+                  <Link href={getLangPath('/qrcode-recognize', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.qrcode_recognize')}
+                  </Link>
+                  
+                  {/* Barcode Section */}
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1 mt-2">
+                    {t('nav.barcode_tools')}
+                  </div>
+                  <Link href={getLangPath('/barcode-generate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.barcode_generate')}
+                  </Link>
+                  <Link href={getLangPath('/barcode-recognize', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.barcode_recognize')}
                   </Link>
                 </div>
               )}
