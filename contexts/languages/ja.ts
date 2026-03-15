@@ -3057,7 +3057,6 @@
     'text_to_image.faq_a4': 'PNG、JPG、WebP形式でのダウンロードをサポートしています。',
     'text_to_image.faq_q5': '生成された画像は独特ですか？',
     'text_to_image.faq_a5': 'はい、テキストに基づいて毎回固有の画像が生成されます。',
-    'nav.colorize_image': '画像着色',
     'colorize_image.description': 'AI技術を使用して白黒写真を自動的に着色します',
     'colorize_image.upload': 'クリックして画像をアップロード',
     'colorize_image.supported': 'JPG、PNG、WebPに対応',
