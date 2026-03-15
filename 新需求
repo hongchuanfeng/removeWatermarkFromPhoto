@@ -537,3 +537,17 @@ image_mosaic.process，
 
 /image-mosaic 这个页面，还是没修改好啊，同一张图片，第二次选择区域进行马赛克 这个功能没实现，
 需要能二次选择区域进行马赛克，请实现这个功能
+
+
+Type error: Type 'string' is not assignable to type 'Language | undefined'.
+
+
+Type error: Type 'string' is not assignable to type 'Language | undefined'.
+  <LanguageProvider lang={lang}>
+上面报错，请修改
+
+
+
+Type error: Module '"@/contexts/LanguageContext"' declares 'Language' locally, but it is not exported.
+
+import type { Language } from '@/contexts/LanguageContext'

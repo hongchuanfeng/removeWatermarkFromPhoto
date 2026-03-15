@@ -14,7 +14,7 @@ import esTranslations from './languages/es'
 import ptTranslations from './languages/pt'
 import koTranslations from './languages/ko'
 
-type Language = 'en' | 'zh' | 'ru' | 'ar' | 'de' | 'ja' | 'fr' | 'es' | 'pt' | 'ko'
+export type Language = 'en' | 'zh' | 'ru' | 'ar' | 'de' | 'ja' | 'fr' | 'es' | 'pt' | 'ko'
 
 interface LanguageContextType {
   language: Language
