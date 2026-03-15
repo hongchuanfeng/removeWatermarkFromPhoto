@@ -3061,6 +3061,5 @@
     'text_to_image.faq_a4': 'PNG, JPG, WebP 형식의 다운로드를 지원합니다.',
     'text_to_image.faq_q5': '생성된 이미지는 고유한가요?',
     'text_to_image.faq_a5': '네, 각 생성은 텍스트에 기반한 고유한 이미지를 생성합니다.',
-    'common.clear': '지우기',
 
 }

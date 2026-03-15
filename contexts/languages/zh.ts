@@ -3136,6 +3136,5 @@
     'text_to_image.faq_a4': '支持PNG、JPG和WebP格式下载。',
     'text_to_image.faq_q5': '生成的图片是唯一的吗？',
     'text_to_image.faq_a5': '是的，每次生成都会根据您的文字创建独特的图片。',
-    'common.clear': '清除',
 
 }

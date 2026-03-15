@@ -3137,6 +3137,5 @@
     'text_to_image.faq_a4': 'We support PNG, JPG, and WebP formats for download.',
     'text_to_image.faq_q5': 'Are the generated images unique?',
     'text_to_image.faq_a5': 'Yes, each generation creates a unique image based on your text.',
-    'common.clear': 'Clear',
 
 }

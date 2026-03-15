@@ -3030,6 +3030,5 @@
     'text_to_image.faq_a4': 'Wir unterstützen PNG, JPG und WebP Formate zum Herunterladen.',
     'text_to_image.faq_q5': 'Sind die erstellten Bilder einzigartig?',
     'text_to_image.faq_a5': 'Ja, jede Erstellung erstellt ein einzigartiges Bild basierend auf Ihrem Text.',
-    'common.clear': 'Löschen',
 
 }

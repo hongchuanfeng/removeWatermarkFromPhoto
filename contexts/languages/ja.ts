@@ -3100,6 +3100,5 @@
     'colorize_image.faq_a4': 'はい、毎日最大10枚の画像を無料で処理できます。',
     'colorize_image.faq_q5': '私の画像は安全ですか？',
     'colorize_image.faq_a5': 'はい、すべての画像はローカルで処理され、処理後に削除されます。',
-    'common.clear': 'クリア',
 
 }

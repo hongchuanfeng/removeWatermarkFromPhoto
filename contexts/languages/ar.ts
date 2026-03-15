@@ -3027,6 +3027,5 @@
     'text_to_image.faq_a4': 'ن支持的格式包括PNG、JPG和WebP。',
     'text_to_image.faq_q5': 'هل الصور المُنشأة فريدة من نوعها؟',
     'text_to_image.faq_a5': 'نعم، كل إنشاء يُنتج صورة فريدة بناءً على نصك.',
-    'common.clear': 'مسح',
 
 }
