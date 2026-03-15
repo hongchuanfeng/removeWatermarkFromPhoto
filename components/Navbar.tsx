@@ -136,176 +136,182 @@ export default function Navbar() {
                   </svg>
                 </button>
                 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu - Horizontal Layout with 2 Columns */}
                 {activeMenu === 'image' && (
                   <div 
-                    className="absolute left-0 mt-0 w-80 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    className="absolute left-0 mt-0 w-[600px] bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
                     onMouseEnter={() => handleMenuEnter('image')}
                     onMouseLeave={handleMenuLeave}
                   >
-                    {/* AI Image Tools */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.ai_image_tools')}
-                    </div>
-                    <Link 
-                      href={getLangPath('/ai-age-change', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ai_age_change')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/gender-swapper', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.gender_swapper')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/ai-face-beautify', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ai_face_beautify')}
-                    </Link>
+                    <div className="flex">
+                      {/* AI Image Tools Column */}
+                      <div className="flex-1 border-r border-gray-100">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.ai_image_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/ai-age-change', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ai_age_change')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/gender-swapper', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.gender_swapper')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ai-face-beautify', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ai_face_beautify')}
+                        </Link>
+                      </div>
 
-                    {/* Image Processing Tools */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 mt-1">
-                      {t('nav.image_processing_tools')}
+                      {/* Image Processing Tools Column */}
+                      <div className="flex-1">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.image_processing_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/image-mosaic', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.image_mosaic')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/image-compress', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.image_compress')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/image-grid', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.image_grid')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/rounded-corner', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.rounded_corner')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/remove-background', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.remove_background')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/crop-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.crop_image')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/grayscale', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.grayscale')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/text-to-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.text_to_image')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/enlarge-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.enlarge_image')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/change-background', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.change_background')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/image-format-conversion', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.image_format_conversion')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/add-watermark', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.add_watermark')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/merge-images', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.merge_images')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/photo-restoration', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.photo_restoration')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/rotate-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.rotate_image')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ico-generator', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ico_generator')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/add-text', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.add_text')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/colorize-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.colorize_image')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/view-exif', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.view_exif')}
+                        </Link>
+                      </div>
                     </div>
-                    <Link 
-                      href={getLangPath('/image-mosaic', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.image_mosaic')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/image-compress', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.image_compress')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/image-grid', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.image_grid')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/rounded-corner', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.rounded_corner')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/remove-background', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.remove_background')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/crop-image', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.crop_image')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/grayscale', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.grayscale')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/text-to-image', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.text_to_image')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/enlarge-image', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.enlarge_image')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/change-background', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.change_background')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/image-format-conversion', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.image_format_conversion')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/add-watermark', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.add_watermark')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/merge-images', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.merge_images')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/photo-restoration', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.photo_restoration')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/rotate-image', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.rotate_image')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/ico-generator', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ico_generator')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/add-text', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.add_text')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/colorize-image', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.colorize_image')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/view-exif', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.view_exif')}
-                    </Link>
                   </div>
                 )}
               </div>
@@ -381,99 +387,105 @@ export default function Navbar() {
                   </svg>
                 </button>
                 
-                {/* Audio & Subtitle Tools Dropdown Menu */}
+                {/* Audio & Subtitle Tools Dropdown Menu - Horizontal Layout */}
                 {activeMenu === 'audio' && (
                   <div 
-                    className="absolute left-0 mt-0 w-72 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    className="absolute left-0 mt-0 w-[480px] bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
                     onMouseEnter={() => handleMenuEnter('audio')}
                     onMouseLeave={handleMenuLeave}
                   >
-                    {/* Audio Tools Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.audio_tools')}
-                    </div>
-                    <Link 
-                      href={getLangPath('/audio-clip-merge', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.audio_clip_merge')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/audio-format-conversion', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.audio_format_conversion')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/vocal-separation', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.vocal_separation')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/audio-to-text', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.audio_to_text')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/audio-to-subtitles', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.audio_to_subtitles')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/audio-repair', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.audio_repair')}
-                    </Link>
+                    <div className="flex">
+                      {/* Audio Tools Section */}
+                      <div className="flex-1 border-r border-gray-100">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.audio_tools_dropdown')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/audio-clip-merge', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.audio_clip_merge')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/audio-format-conversion', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.audio_format_conversion')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/vocal-separation', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.vocal_separation')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/audio-to-text', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.audio_to_text')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/audio-to-subtitles', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.audio_to_subtitles')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/audio-repair', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.audio_repair')}
+                        </Link>
+                      </div>
 
-                    {/* Subtitle Tools Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 mt-1">
-                      {t('nav.subtitle_tools')}
+                      {/* Subtitle Tools Section */}
+                      <div className="flex-1">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.subtitle_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/text-to-subtitles', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.text_to_subtitles')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/subtitles-to-text', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.subtitles_to_text')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/subtitle-format-conversion', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.subtitle_format_conversion')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/subtitle-translation', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.subtitle_translation')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/subtitle-merge', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.subtitle_merge')}
+                        </Link>
+                      </div>
                     </div>
-                    <Link 
-                      href={getLangPath('/text-to-subtitles', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.text_to_subtitles')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/subtitles-to-text', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.subtitles_to_text')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/subtitle-format-conversion', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.subtitle_format_conversion')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/subtitle-translation', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.subtitle_translation')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/subtitle-merge', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.subtitle_merge')}
-                    </Link>
                   </div>
                 )}
               </div>
@@ -492,139 +504,147 @@ export default function Navbar() {
                   </svg>
                 </button>
                 
-                {/* Other Tools Dropdown Menu */}
+                {/* Other Tools Dropdown Menu - Horizontal Layout */}
                 {activeMenu === 'other' && (
                   <div 
-                    className="absolute left-0 mt-0 w-72 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    className="absolute left-0 mt-0 w-[600px] bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
                     onMouseEnter={() => handleMenuEnter('other')}
                     onMouseLeave={handleMenuLeave}
                   >
-                    {/* CSV Tools Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.csv_tools')}
+                    <div className="flex">
+                      {/* CSV Tools Section */}
+                      <div className="flex-1 border-r border-gray-100">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.csv_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/csv-merge', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.csv_merge')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/csv-split', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.csv_split')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/csv-deduplicate', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.csv_deduplicate')}
+                        </Link>
+                      </div>
+                      
+                      {/* eBook Tools Section */}
+                      <div className="flex-1 border-r border-gray-100">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.ebook_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/ebook-merge', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ebook_merge')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ebook-watermark-removal', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ebook_watermark_removal')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ebook-to-speech', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ebook_to_speech')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ebook-subtitles', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ebook_subtitles')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ebook-format-conversion', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.ebook_format_conversion')}
+                        </Link>
+                      </div>
+                      
+                      {/* PDF Tools Section */}
+                      <div className="flex-1">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.pdf_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/pdf-merge', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_merge')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-split', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_split')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-deduplicate', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_deduplicate')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-convert', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_convert')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-to-audio', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_to_audio')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-to-text', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_to_text')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-to-subtitles', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_to_subtitles')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-translate', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_translate')}
+                        </Link>
+                      </div>
                     </div>
-                    <Link 
-                      href={getLangPath('/csv-merge', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.csv_merge')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/csv-split', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.csv_split')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/csv-deduplicate', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.csv_deduplicate')}
-                    </Link>
-                    
-                    {/* eBook Tools Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.ebook_tools')}
-                    </div>
-                    <Link 
-                      href={getLangPath('/ebook-merge', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ebook_merge')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/ebook-watermark-removal', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ebook_watermark_removal')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/ebook-to-speech', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ebook_to_speech')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/ebook-subtitles', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ebook_subtitles')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/ebook-format-conversion', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.ebook_format_conversion')}
-                    </Link>
-                    
-                    {/* PDF Tools Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.pdf_tools')}
-                    </div>
-                    <Link 
-                      href={getLangPath('/pdf-merge', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_merge')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-split', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_split')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-deduplicate', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_deduplicate')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-convert', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_convert')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-to-audio', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_to_audio')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-to-text', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_to_text')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-to-subtitles', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_to_subtitles')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/pdf-translate', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.pdf_translate')}
-                    </Link>
                   </div>
                 )}
               </div> 
@@ -646,47 +666,53 @@ export default function Navbar() {
                 {/* QR Code & Barcode Tools Dropdown Menu */}
                 {activeMenu === 'qrcode' && (
                   <div 
-                    className="absolute left-0 mt-0 w-64 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                    className="absolute left-0 mt-0 w-[400px] bg-white rounded-md shadow-lg py-2 z-50 border border-gray-100"
                     onMouseEnter={() => handleMenuEnter('qrcode')}
                     onMouseLeave={handleMenuLeave}
                   >
-                    {/* QR Code Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.qrcode_tools')}
+                    <div className="flex">
+                      {/* QR Code Section */}
+                      <div className="flex-1 border-r border-gray-100">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.qrcode_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/qrcode-generate', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.qrcode_generate')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/qrcode-recognize', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.qrcode_recognize')}
+                        </Link>
+                      </div>
+                      
+                      {/* Barcode Section */}
+                      <div className="flex-1">
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                          {t('nav.barcode_tools')}
+                        </div>
+                        <Link 
+                          href={getLangPath('/barcode-generate', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.barcode_generate')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/barcode-recognize', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.barcode_recognize')}
+                        </Link>
+                      </div>
                     </div>
-                    <Link 
-                      href={getLangPath('/qrcode-generate', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.qrcode_generate')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/qrcode-recognize', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.qrcode_recognize')}
-                    </Link>
-                    
-                    {/* Barcode Section */}
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100">
-                      {t('nav.barcode_tools')}
-                    </div>
-                    <Link 
-                      href={getLangPath('/barcode-generate', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.barcode_generate')}
-                    </Link>
-                    <Link 
-                      href={getLangPath('/barcode-recognize', language)} 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                    >
-                      {t('nav.barcode_recognize')}
-                    </Link>
                   </div>
                 )}
               </div>

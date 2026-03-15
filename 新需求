@@ -434,7 +434,106 @@ image_grid.upload_multiple
 按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
 
 
-/ico-generator，页面路径：/app/[lang]//ico-generator/page.tsx,
+/ico-generator，页面路径：/app/[lang]/ico-generator/page.tsx,
 多语言文件路径:/contexts/LanguageContext.tsx,
 这个页面的功能说明，示例，常见问题都没实现多语言，请实现多语言，
 按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
+
+
+
+
+
+/ico-generator，页面路径：/app/[lang]/ico-generator/page.tsx,
+多语言文件路径:/contexts/LanguageContext.tsx,
+这个页面的功能说明，示例，常见问题都实现多语言，实现法语，葡萄牙语，西班牙语，韩语，实现多语言。
+按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
+
+
+
+/add-text，页面路径：/app/[lang]/add-text/page.tsx,
+多语言文件路径:/contexts/LanguageContext.tsx,
+这个页面的功能说明，示例，常见问题都没实现多语言，请实现多语言，
+按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
+
+
+/add-text，页面路径：/app/[lang]/add-text/page.tsx,
+多语言文件路径:/contexts/LanguageContext.tsx,
+请实现阿拉伯语、日语、韩语，请实现这三个多语言。
+按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
+
+
+
+
+/colorize-image，页面路径：/app/[lang]/colorize-image/page.tsx,
+多语言文件路径:/contexts/LanguageContext.tsx,
+这个页面的功能说明，示例，常见问题都没实现多语言，请实现多语言，
+按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？  
+
+
+
+
+/colorize-image，页面路径：/app/[lang]/colorize-image/page.tsx,
+多语言文件路径:/contexts/LanguageContext.tsx,
+这个页面的功能说明，示例，常见问题都实现多语言，实现法语，葡萄牙语，西班牙语，韩语，实现多语言。
+按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
+把执行后的内容写到log.md文件中，请记得完成这个需求。
+
+
+
+/colorize-image，页面路径：/app/[lang]/colorize-image/page.tsx,实现西班牙语功能。
+
+
+
+
+/colorize-image，页面路径：/app/[lang]/colorize-image/page.tsx,实现葡萄牙语功能。
+
+
+
+/contexts/LanguageContext.tsx, 这个文件太多，将这个文件拆分每一个语言一个文件，
+文件保存到 contexts/languages 文件夹中，而不是所有的语言都放到这个文件中，
+contexts/languages 文件夹下面的语言文件要主要编码，不能让它乱码了，
+修改后不影响项目运行，就是不影响多语言运行，明白我的意思吗？
+
+
+
+/view-exif,页面路径：/app/[lang]/view-exif/page.tsx,
+多语言文件路径:/contexts/languages 文件夹中,
+这个页面的功能说明，示例，常见问题都没实现多语言，请实现多语言，除了中文与英文之外，其他都要实现
+按两个语言一组来实现，以防超时，不能漏掉，明白我的意思吗？
+
+
+
+
+将“二维码&条码”的二级菜单以横向的方向展示，不要像原来那样是纵向的，请修改。
+
+
+修改错了，是二维码是一列， 条码一列，每列是纵向的，而不是每列是横向的，请修改。
+
+
+将“PDF&CSV&电子书”的二级菜单以横向的方向展示，不要像原来那样是纵向的，每一列是纵向的，明白我的意思吗
+
+这三列横向排列，每列内部是纵向的
+
+
+将“音频&字幕"的二级菜单以横向的方向展示，不要像原来那样是纵向的，每列横向排列，每列内部是纵向的，明白我的意思吗
+
+
+
+将“音频&字幕"的二级菜单中的"音频&字幕"改为"音频工具"，多语言都要实现哦
+
+
+
+将“图片工具"的二级菜单以横向的方向展示，不要像原来那样是纵向的，每列横向排列，每列内部是纵向的，就两列，一列是AI图片，另外一个是图片工具，明白我的意思吗
+
+
+
+将 /image-mosaic 这个页面的功能实现，
+这个页面的功能是对图片进行马赛克处理，用户可以选择某个局域进行马赛克，然后给用户下载，
+image_mosaic.mosaic_size，
+image_mosaic.process，
+上面两个文本没有实现多语言功能，请实现
+
+
+
+/image-mosaic 这个页面，还是没修改好啊，同一张图片，第二次选择区域进行马赛克 这个功能没实现，
+需要能二次选择区域进行马赛克，请实现这个功能
