@@ -734,7 +734,6 @@
     'nav.ebook_format_conversion': 'eBook Format Conversion',
     'nav.qrcode_tools': 'QR Code Tools',
     'nav.barcode_tools': 'Barcode Tools',
-    'nav.qrcode_barcode_tools': 'QR Code & Barcode',
     'nav.qrcode_generate': 'QR Code Generate',
     'nav.qrcode_recognize': 'QR Code Recognize',
     'nav.barcode_generate': 'Barcode Generate',
