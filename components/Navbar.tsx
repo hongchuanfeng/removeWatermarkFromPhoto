@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/contexts/LanguageContext'
+import type { Language } from '@/contexts/LanguageContext'
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
@@ -84,11 +85,11 @@ export default function Navbar() {
     router.push('/')
   }
 
-  const handleLanguageChange = (newLang: string) => {
+  const handleLanguageChange = (newLang: Language) => {
     console.log('[DEBUG] handleLanguageChange called, newLang:', newLang)
     
     // 始终更新语言状态
-    setLanguage(newLang as any)
+    setLanguage(newLang)
     document.cookie = `language=${newLang};path=/;max-age=31536000`
     localStorage.setItem('language', newLang)
     
