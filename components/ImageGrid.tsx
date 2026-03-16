@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function ImageGrid() {
   const { t } = useLanguage()
@@ -10,18 +10,23 @@ export default function ImageGrid() {
   const [gridSpacing, setGridSpacing] = useState(10)
   const [processedImage, setProcessedImage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff')
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files) {
       const newImages: string[] = []
+      let loadedCount = 0
+      
       Array.from(files).forEach(file => {
         const reader = new FileReader()
-        reader.onload = (e) => {
-          newImages.push(e.target?.result as string)
-          if (newImages.length === files.length) {
-            setSelectedImages([...selectedImages, ...newImages])
+        reader.onload = (event) => {
+          newImages.push(event.target?.result as string)
+          loadedCount++
+          if (loadedCount === files.length) {
+            setSelectedImages(prev => [...prev, ...newImages])
           }
         }
         reader.readAsDataURL(file)
@@ -29,13 +34,87 @@ export default function ImageGrid() {
     }
   }
 
-  const handleProcess = async () => {
+  const createGrid = async () => {
     if (selectedImages.length === 0) return
+    
     setIsProcessing(true)
-    setTimeout(() => {
-      setProcessedImage(selectedImages[0])
+    
+    try {
+      const images: HTMLImageElement[] = await Promise.all(
+        selectedImages.map(src => {
+          return new Promise<HTMLImageElement>((resolve) => {
+            const img = new Image()
+            img.onload = () => resolve(img)
+            img.onerror = () => resolve(null as any)
+            img.src = src
+          })
+        })
+      )
+      
+      const validImages = images.filter(img => img && img.width > 0)
+      if (validImages.length === 0) {
+        setIsProcessing(false)
+        return
+      }
+      
+      // 计算网格尺寸
+      const cols = gridCols
+      const rows = Math.ceil(validImages.length / cols)
+      const cellWidth = 400
+      const cellHeight = 400
+      const spacing = gridSpacing
+      
+      const totalWidth = cols * cellWidth + (cols - 1) * spacing
+      const totalHeight = rows * cellHeight + (rows - 1) * spacing
+      
+      const canvas = document.createElement('canvas')
+      canvas.width = totalWidth
+      canvas.height = totalHeight
+      
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        setIsProcessing(false)
+        return
+      }
+      
+      // 填充背景色
+      ctx.fillStyle = backgroundColor
+      ctx.fillRect(0, 0, totalWidth, totalHeight)
+      
+      // 绘制图片
+      validImages.forEach((img, idx) => {
+        const col = idx % cols
+        const row = Math.floor(idx / cols)
+        const x = col * (cellWidth + spacing)
+        const y = row * (cellHeight + spacing)
+        
+        // 计算图片缩放（保持比例填充）
+        const imgRatio = img.width / img.height
+        const cellRatio = cellWidth / cellHeight
+        
+        let drawWidth = cellWidth
+        let drawHeight = cellHeight
+        let drawX = x
+        let drawY = y
+        
+        if (imgRatio > cellRatio) {
+          drawHeight = cellWidth / imgRatio
+          drawY = y + (cellHeight - drawHeight) / 2
+        } else {
+          drawWidth = cellHeight * imgRatio
+          drawX = x + (cellWidth - drawWidth) / 2
+        }
+        
+        ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
+      })
+      
+      const dataUrl = canvas.toDataURL('image/png')
+      setProcessedImage(dataUrl)
+    } catch (error) {
+      console.error('Grid creation failed:', error)
+    } finally {
       setIsProcessing(false)
-    }, 2000)
+    }
   }
 
   const handleDownload = () => {
@@ -46,6 +125,16 @@ export default function ImageGrid() {
     link.click()
   }
 
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, idx) => idx !== index))
+    setProcessedImage(null)
+  }
+
+  const clearAll = () => {
+    setSelectedImages([])
+    setProcessedImage(null)
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="text-center mb-12">
@@ -54,28 +143,38 @@ export default function ImageGrid() {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-8">
-        <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="flex items-center justify-center gap-4 mb-6 flex-wrap">
           <label className="text-gray-700">{t('image_grid.columns')}:</label>
           <select 
             value={gridCols}
-            onChange={(e) => setGridCols(Number(e.target.value))}
+            onChange={(e) => { setGridCols(Number(e.target.value)); setProcessedImage(null); }}
             className="border border-gray-300 rounded-lg px-4 py-2"
           >
             <option value={2}>2</option>
             <option value={3}>3</option>
             <option value={4}>4</option>
+            <option value={5}>5</option>
           </select>
+          
           <label className="text-gray-700 ml-4">{t('image_grid.spacing')}:</label>
           <select 
             value={gridSpacing}
-            onChange={(e) => setGridSpacing(Number(e.target.value))}
+            onChange={(e) => { setGridSpacing(Number(e.target.value)); setProcessedImage(null); }}
             className="border border-gray-300 rounded-lg px-4 py-2"
           >
-            <option value={0}>0</option>
+            <option value={0}>0px</option>
             <option value={5}>5px</option>
             <option value={10}>10px</option>
             <option value={20}>20px</option>
           </select>
+          
+          <label className="text-gray-700 ml-4">{t('image_grid.background')}:</label>
+          <input 
+            type="color"
+            value={backgroundColor}
+            onChange={(e) => { setBackgroundColor(e.target.value); setProcessedImage(null); }}
+            className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+          />
         </div>
 
         <div 
@@ -99,18 +198,34 @@ export default function ImageGrid() {
 
         {selectedImages.length > 0 && (
           <div className="mb-6">
-            <p className="text-gray-600 mb-2">{selectedImages.length} {t('image_grid.images_selected')}</p>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-600">{selectedImages.length} {t('image_grid.images_selected')}</p>
+              <button
+                onClick={clearAll}
+                className="text-sm text-red-500 hover:text-red-700"
+              >
+                {t('common.clear')}
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {selectedImages.map((img, idx) => (
-                <img key={idx} src={img} alt={`Selected ${idx}`} className="w-20 h-20 object-cover rounded" />
+                <div key={idx} className="relative group">
+                  <img src={img} alt={`Selected ${idx}`} className="w-20 h-20 object-cover rounded" />
+                  <button
+                    onClick={() => removeImage(idx)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                  >
+                    ×
+                  </button>
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-4">
           <button
-            onClick={handleProcess}
+            onClick={createGrid}
             disabled={isProcessing || selectedImages.length === 0}
             className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
           >

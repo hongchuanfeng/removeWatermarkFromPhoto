@@ -549,5 +549,58 @@ Type error: Type 'string' is not assignable to type 'Language | undefined'.
 
 
 Type error: Module '"@/contexts/LanguageContext"' declares 'Language' locally, but it is not exported.
-
 import type { Language } from '@/contexts/LanguageContext'
+上面报错
+
+
+
+Type error: Argument of type 'string' is not assignable to parameter of type 'Language'.
+
+onChange={(e) => {
+                  console.log('[DEBUG] select onChange triggered, value:', e.target.value)
+                 handleLanguageChange(e.target.value)
+                             
+                              }}
+
+上面报错
+
+
+
+Type error: An object literal cannot have multiple properties with the same name.
+ 'common.clear': 'مسح',
+
+
+ /image-compress, 这个页面实现该功能，对大图片进行压缩，包括各种格式，压缩后，让用户下载，请实现。
+
+
+ /image-grid，将该页面实现图片网格功能，请实现
+
+
+ /rounded-corner，将该页面实现图片圆角功能，可以自定义圆角参数，请实现。
+
+
+
+ /remove-background，实现该页面功能，将图片的背景去掉，请实现该功能。
+
+ /crop-image，实现该页面功能，对上传的图片进行裁剪功能，请实现。
+
+ /grayscale，对该页面实现图片灰色处理，请实现。
+
+ /text-to-image，实现该页面功能，文字转为图片，文字颜色和大小可以自定义，请实现。
+
+
+  /text-to-image，这个页面的input输入框字体颜色改为黑色，请实现。
+
+  /enlarge-image，实现该页面功能，对图片进行扩大，请实现。
+
+
+  /change-background，实现该页面的图片背景色更换的功能。
+
+
+  /image-format-conversion，实现该页面的图片格式转换功能， 
+
+
+  /add-watermark, 实现该页面功能，对图片添加水印功能，文字水印和图片水印，文字水印可以自定义，图片水印可以自定义，请实现。
+
+
+  /merge-images，实现该页面图片合并的功能，可以横向和纵向实现。

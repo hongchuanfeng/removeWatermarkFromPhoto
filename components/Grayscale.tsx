@@ -8,11 +8,48 @@ export default function Grayscale() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [processedImage, setProcessedImage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [fileName, setFileName] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const convertToGrayscale = (imageSrc: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Canvas context not available'))
+          return
+        }
+        
+        ctx.drawImage(img, 0, 0)
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
+        
+        // 灰度转换 - 使用 luminance 公式: 0.299*R + 0.587*G + 0.114*B
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+          data[i] = gray     // R
+          data[i + 1] = gray // G
+          data[i + 2] = gray // B
+        }
+        
+        ctx.putImageData(imageData, 0, 0)
+        resolve(canvas.toDataURL('image/png'))
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = imageSrc
+    })
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setFileName(file.name)
       const reader = new FileReader()
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string)
@@ -25,16 +62,22 @@ export default function Grayscale() {
   const handleProcess = async () => {
     if (!selectedImage) return
     setIsProcessing(true)
-    setTimeout(() => {
-      setProcessedImage(selectedImage)
+    
+    try {
+      const result = await convertToGrayscale(selectedImage)
+      setProcessedImage(result)
+    } catch (error) {
+      console.error('Grayscale conversion failed:', error)
+    } finally {
       setIsProcessing(false)
-    }, 2000)
+    }
   }
 
   const handleDownload = () => {
     if (!processedImage) return
+    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '')
     const link = document.createElement('a')
-    link.download = 'grayscale-image.png'
+    link.download = `${nameWithoutExt}_grayscale.png`
     link.href = processedImage
     link.click()
   }
@@ -79,7 +122,7 @@ export default function Grayscale() {
           <div className="mt-8 pt-8 border-t border-gray-200">
             <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">{t('grayscale.result')}</h3>
             <div className="flex justify-center mb-6">
-              <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" style={{ filter: 'grayscale(100%)' }} />
+              <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
             </div>
             <div className="flex justify-center">
               <button onClick={handleDownload} className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
