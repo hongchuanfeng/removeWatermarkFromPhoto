@@ -3,11 +3,23 @@
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useState, useRef } from 'react'
 
+interface IcoOptions {
+  size: number
+  cornerRadius: number
+}
+
+const ICO_SIZES = [16, 32, 48, 64, 128, 256]
+const CORNER_RADIUS_OPTIONS = [0, 2, 4, 6, 8, 10, 12, 16]
+
 export default function IcoGenerator() {
   const { t } = useLanguage()
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [processedImage, setProcessedImage] = useState<string | null>(null)
+  const [processedImages, setProcessedImages] = useState<string[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
+  const [options, setOptions] = useState<IcoOptions>({
+    size: 256,
+    cornerRadius: 0
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,27 +28,91 @@ export default function IcoGenerator() {
       const reader = new FileReader()
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string)
-        setProcessedImage(null)
+        setProcessedImages([])
       }
       reader.readAsDataURL(file)
     }
   }
 
+  const generateIco = async (imageSrc: string, size: number, cornerRadius: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Canvas context not available'))
+          return
+        }
+
+        canvas.width = size
+        canvas.height = size
+
+        // Create rounded rectangle path
+        if (cornerRadius > 0) {
+          const radius = (cornerRadius / 100) * size
+          ctx.beginPath()
+          ctx.moveTo(radius, 0)
+          ctx.lineTo(size - radius, 0)
+          ctx.quadraticCurveTo(size, 0, size, radius)
+          ctx.lineTo(size, size - radius)
+          ctx.quadraticCurveTo(size, size, size - radius, size)
+          ctx.lineTo(radius, size)
+          ctx.quadraticCurveTo(0, size, 0, size - radius)
+          ctx.lineTo(0, radius)
+          ctx.quadraticCurveTo(0, 0, radius, 0)
+          ctx.closePath()
+          ctx.clip()
+        }
+
+        // Draw image scaled to fit
+        ctx.drawImage(img, 0, 0, size, size)
+
+        resolve(canvas.toDataURL('image/png'))
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = imageSrc
+    })
+  }
+
   const handleProcess = async () => {
     if (!selectedImage) return
     setIsProcessing(true)
-    setTimeout(() => {
-      setProcessedImage(selectedImage)
+
+    try {
+      // Generate multiple sizes
+      const sizes = options.size === 256 
+        ? [16, 32, 48, 256] 
+        : [options.size]
+      
+      const results = await Promise.all(
+        sizes.map(size => generateIco(selectedImage, size, options.cornerRadius))
+      )
+      
+      setProcessedImages(results)
+    } catch (error) {
+      console.error('ICO generation failed:', error)
+    } finally {
       setIsProcessing(false)
-    }, 2000)
+    }
   }
 
-  const handleDownload = () => {
-    if (!processedImage) return
+  const handleDownload = (imageDataUrl: string, size: number) => {
     const link = document.createElement('a')
-    link.download = 'favicon.ico'
-    link.href = processedImage
+    link.download = `favicon-${size}x${size}.png`
+    link.href = imageDataUrl
     link.click()
+  }
+
+  const handleDownloadAll = () => {
+    processedImages.forEach((img, index) => {
+      const sizes = options.size === 256 
+        ? [16, 32, 48, 256] 
+        : [options.size]
+      setTimeout(() => {
+        handleDownload(img, sizes[index])
+      }, index * 100)
+    })
   }
 
   return (
@@ -62,28 +138,125 @@ export default function IcoGenerator() {
         ) : (
           <div className="space-y-6">
             <div className="flex justify-center">
-              <img src={selectedImage} alt="Selected" className="max-w-full max-h-96 rounded-lg" />
+              <img src={selectedImage} alt="Selected" className="max-w-full max-h-64 rounded-lg" />
             </div>
+
+            {/* Size Selection */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">{t('ico_generator.size')}</label>
+              <div className="flex flex-wrap justify-center gap-2">
+                {ICO_SIZES.map(size => (
+                  <button
+                    key={size}
+                    onClick={() => setOptions(prev => ({ ...prev, size }))}
+                    className={`px-4 py-2 rounded-lg border transition ${
+                      options.size === size
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {size}x{size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Corner Radius Selection */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">{t('ico_generator.corner_radius') || 'Corner Radius'}</label>
+              <div className="flex flex-wrap justify-center gap-2">
+                {CORNER_RADIUS_OPTIONS.map(radius => (
+                  <button
+                    key={radius}
+                    onClick={() => setOptions(prev => ({ ...prev, cornerRadius: radius }))}
+                    className={`px-4 py-2 rounded-lg border transition ${
+                      options.cornerRadius === radius
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {radius}%
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">{t('ico_generator.preview') || 'Preview'}</label>
+              <div 
+                className="w-32 h-32 border border-gray-300 rounded-lg overflow-hidden"
+                style={{ 
+                  borderRadius: `${options.cornerRadius}%`,
+                  maxWidth: `${options.size > 64 ? 64 : options.size}px`,
+                  maxHeight: `${options.size > 64 ? 64 : options.size}px`
+                }}
+              >
+                <img 
+                  src={selectedImage} 
+                  alt="Preview" 
+                  className="w-full h-full object-cover"
+                  style={{ 
+                    borderRadius: `${options.cornerRadius}%`
+                  }}
+                />
+              </div>
+            </div>
+
             <div className="flex justify-center gap-4">
-              <button onClick={() => { setSelectedImage(null); setProcessedImage(null); }} className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+              <button 
+                onClick={() => { setSelectedImage(null); setProcessedImages([]); }} 
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              >
                 {t('common.clear')}
               </button>
-              <button onClick={handleProcess} disabled={isProcessing} className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition disabled:opacity-50">
+              <button 
+                onClick={handleProcess} 
+                disabled={isProcessing} 
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+              >
                 {isProcessing ? t('ico_generator.processing') : t('ico_generator.generate')}
               </button>
             </div>
           </div>
         )}
 
-        {processedImage && (
+        {processedImages.length > 0 && (
           <div className="mt-8 pt-8 border-t border-gray-200">
             <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">{t('ico_generator.result')}</h3>
-            <div className="flex justify-center mb-6">
-              <img src={processedImage} alt="Processed" className="w-32 h-32 rounded-lg" />
+            <div className="flex flex-wrap justify-center gap-6 mb-6">
+              {processedImages.map((img, index) => {
+                const sizes = options.size === 256 ? [16, 32, 48, 256] : [options.size]
+                const size = sizes[index]
+                return (
+                  <div key={size} className="flex flex-col items-center gap-2">
+                    <div 
+                      className="border border-gray-300 overflow-hidden"
+                      style={{ 
+                        borderRadius: `${options.cornerRadius}%`,
+                        width: '64px',
+                        height: '64px'
+                      }}
+                    >
+                      <img src={img} alt={`${size}x${size}`} className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-sm text-gray-600">{size}x{size}</span>
+                    <button 
+                      onClick={() => handleDownload(img, size)}
+                      className="text-xs text-primary-600 hover:text-primary-700"
+                    >
+                      {t('ico_generator.download')}
+                    </button>
+                  </div>
+                )
+              })}
             </div>
             <div className="flex justify-center">
-              <button onClick={handleDownload} className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
-                {t('ico_generator.download')}
+              <button 
+                onClick={handleDownloadAll}
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
+              >
+                {t('ico_generator.download_all') || 'Download All'}
               </button>
             </div>
           </div>
@@ -92,4 +265,3 @@ export default function IcoGenerator() {
     </div>
   )
 }
-

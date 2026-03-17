@@ -604,3 +604,41 @@ Type error: An object literal cannot have multiple properties with the same name
 
 
   /merge-images，实现该页面图片合并的功能，可以横向和纵向实现。
+
+  /photo-restoration,实现该页面的图片修复功能，请实现。
+
+
+  /rotate-image,实现该页面的图片旋转功能，请实现。
+
+  /ico-generator，实现该页面的图片ico图标生成功能，包括ico的圆角和大小都可以自定义，请实现。
+
+
+
+  /add-text，实现对图片添加文字，文字可以设置颜色和大小，位置，请实现。
+
+
+  /colorize-image，实现该页面对页面加上颜色，请实现。
+
+  /view-exif，实现该页面的图片exif信息查看功能，请实现。
+
+
+
+  /text-to-subtitles，实现该页面文字转为字幕文件的功能，字幕文件可以设置格式，文字输入框字体设置为黑色，请实现。
+
+
+  /subtitles-to-text，实现该页面字幕转为文字功能，请实现。
+
+
+  /subtitle-format-conversion，实现该页面的字幕格式转换功能，请实现。
+
+
+  /subtitle-translation，实现该页面字幕翻译功能，请实现。
+
+  /subtitle-merge，实现该页面的多个字幕文件合并功能，请实现。
+
+
+  /csv-merge, 实现该页面的csv文件合并，请实现。
+
+  /csv-split，实现该页面的csv文件拆分，请实现。
+
+  /csv-deduplicate，实现该页面的csv去重功能，请实现。

@@ -11,6 +11,42 @@ export default function RotateImage() {
   const [rotation, setRotation] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const rotateImage = (imageSrc: string, angle: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Canvas context not available'))
+          return
+        }
+
+        // Convert angle to radians
+        const radians = (angle * Math.PI) / 180
+        const sin = Math.abs(Math.sin(radians))
+        const cos = Math.abs(Math.cos(radians))
+
+        // Calculate new canvas dimensions
+        const newWidth = img.width * cos + img.height * sin
+        const newHeight = img.width * sin + img.height * cos
+
+        canvas.width = newWidth
+        canvas.height = newHeight
+
+        // Translate to center and rotate
+        ctx.translate(newWidth / 2, newHeight / 2)
+        ctx.rotate(radians)
+        ctx.drawImage(img, -img.width / 2, -img.height / 2)
+
+        const rotatedDataUrl = canvas.toDataURL('image/png')
+        resolve(rotatedDataUrl)
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = imageSrc
+    })
+  }
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -18,6 +54,7 @@ export default function RotateImage() {
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string)
         setProcessedImage(null)
+        setRotation(0)
       }
       reader.readAsDataURL(file)
     }
@@ -26,10 +63,15 @@ export default function RotateImage() {
   const handleProcess = async () => {
     if (!selectedImage) return
     setIsProcessing(true)
-    setTimeout(() => {
-      setProcessedImage(selectedImage)
+    
+    try {
+      const rotated = await rotateImage(selectedImage, rotation)
+      setProcessedImage(rotated)
+    } catch (error) {
+      console.error('Rotation failed:', error)
+    } finally {
       setIsProcessing(false)
-    }, 2000)
+    }
   }
 
   const handleDownload = () => {
@@ -38,6 +80,10 @@ export default function RotateImage() {
     link.download = 'rotated-image.png'
     link.href = processedImage
     link.click()
+  }
+
+  const quickRotate = (degrees: number) => {
+    setRotation((prev) => (prev + degrees) % 360)
   }
 
   return (
@@ -65,11 +111,26 @@ export default function RotateImage() {
             <div className="flex justify-center">
               <img src={selectedImage} alt="Selected" className="max-w-full max-h-96 rounded-lg" style={{ transform: `rotate(${rotation}deg)` }} />
             </div>
+            
             <div className="flex items-center justify-center gap-4">
-              <button onClick={() => setRotation(r => r - 90)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">-90°</button>
-              <button onClick={() => setRotation(r => r + 90)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">+90°</button>
-              <button onClick={() => setRotation(r => r + 180)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">180°</button>
+              <button onClick={() => quickRotate(-90)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900">-90°</button>
+              <button onClick={() => quickRotate(90)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900">+90°</button>
+              <button onClick={() => quickRotate(180)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900">180°</button>
             </div>
+
+            <div className="flex items-center justify-center gap-4">
+              <label className="text-gray-700">{t('rotate_image.angle') || 'Angle'}:</label>
+              <input 
+                type="range" 
+                min="0" 
+                max="360" 
+                value={rotation}
+                onChange={(e) => setRotation(Number(e.target.value))}
+                className="w-48"
+              />
+              <span className="text-gray-600">{rotation}°</span>
+            </div>
+
             <div className="flex justify-center gap-4">
               <button onClick={() => { setSelectedImage(null); setProcessedImage(null); setRotation(0); }} className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                 {t('common.clear')}
@@ -85,7 +146,7 @@ export default function RotateImage() {
           <div className="mt-8 pt-8 border-t border-gray-200">
             <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">{t('rotate_image.result')}</h3>
             <div className="flex justify-center mb-6">
-              <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" style={{ transform: `rotate(${rotation}deg)` }} />
+              <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
             </div>
             <div className="flex justify-center">
               <button onClick={handleDownload} className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">

@@ -1,4 +1,4 @@
-import CSVTool from '@/components/CSVTool'
+import CSVSplit from '@/components/CSVSplit'
 import CSVToolInfo from '@/components/CSVToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangCsvSplitPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <CSVTool toolKey="csv_split" />
+      <CSVSplit />
       <CSVToolInfo toolKey="csv_split" exampleImages={exampleImages} />
       <CTA />
     </div>
