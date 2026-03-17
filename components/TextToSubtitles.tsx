@@ -275,7 +275,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     {previewSegments.slice(0, 5).map((seg) => (
                       <div key={seg.id} className="mb-2 pb-2 border-b border-gray-200 last:border-0">
                         <span className="text-xs text-gray-500">
-                          {seg.startTime} --> {seg.endTime}
+                          {`${seg.startTime} --> ${seg.endTime}`}
                         </span>
                         <p className="text-gray-900">{seg.text}</p>
                       </div>
