@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
@@ -40,8 +40,14 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(un
 export function LanguageProvider({ children, lang = 'en' }: { children: React.ReactNode; lang?: Language }) {
   const [language, setLanguage] = useState<Language>(lang)
 
-  const t = (key: string): string => {
-    return translations[language]?.[key] || translations.en?.[key] || key
+  const t = (key: string, params?: Record<string, number | string>): string => {
+    let text = translations[language]?.[key] || translations.en?.[key] || key
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v))
+      })
+    }
+    return text
   }
 
   return (
