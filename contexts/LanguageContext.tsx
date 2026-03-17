@@ -19,7 +19,7 @@ export type Language = 'en' | 'zh' | 'ru' | 'ar' | 'de' | 'ja' | 'fr' | 'es' | '
 interface LanguageContextType {
   language: Language
   setLanguage: (lang: Language) => void
-  t: (key: string) => string
+  t: (key: string, params?: Record<string, number | string>) => string
 }
 
 const translations: Record<Language, Record<string, string>> = {
@@ -44,7 +44,7 @@ export function LanguageProvider({ children, lang = 'en' }: { children: React.Re
     let text = translations[language]?.[key] || translations.en?.[key] || key
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
-        text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v))
+        text = text.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v))
       })
     }
     return text
