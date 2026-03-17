@@ -1168,6 +1168,9 @@ export default {    'nav.home': 'Startseite',
     'csv_deduplicate.download': 'Herunterladen',
     'csv_deduplicate.copy': 'Kopieren',
     'csv_deduplicate.edit': 'Neu starten',
+    'csv_deduplicate.columns': 'Spalten',
+    'csv_deduplicate.rows': 'Zeilen',
+    'csv_deduplicate.error': 'Bei der Deduplizierung ist ein Fehler aufgetreten',
 
     // eBook-Tools
     'nav.ebook_tools': 'eBook-Tools',

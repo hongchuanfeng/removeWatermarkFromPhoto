@@ -1166,6 +1166,9 @@ export default {    'nav.home': 'الرئيسية',
     'csv_deduplicate.download': 'تحميل',
     'csv_deduplicate.copy': 'نسخ',
     'csv_deduplicate.edit': 'البدء من جديد',
+    'csv_deduplicate.columns': 'أعمدة',
+    'csv_deduplicate.rows': 'صفوف',
+    'csv_deduplicate.error': 'حدث خطأ أثناء إزالة التكرارات',
 
     // أدوات الكتب الإلكترونية
     'nav.ebook_tools': 'أدوات الكتب الإلكترونية',

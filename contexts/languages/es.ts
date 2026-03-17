@@ -1209,6 +1209,9 @@ export default {    'nav.home': 'Inicio',
     'csv_deduplicate.download': 'Descargar',
     'csv_deduplicate.copy': 'Copiar',
     'csv_deduplicate.edit': 'Empezar de nuevo',
+    'csv_deduplicate.columns': 'columnas',
+    'csv_deduplicate.rows': 'filas',
+    'csv_deduplicate.error': 'Se produjo un error durante la deduplicación',
 
     // Herramientas de eBook
     'nav.ebook_tools': 'Herramientas de eBook',

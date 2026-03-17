@@ -824,6 +824,9 @@ export default {    'nav.home': '首页',
     'csv_deduplicate.download': '下载',
     'csv_deduplicate.copy': '复制',
     'csv_deduplicate.edit': '重新开始',
+    'csv_deduplicate.columns': '列',
+    'csv_deduplicate.rows': '行',
+    'csv_deduplicate.error': '去重过程中发生错误',
 
     // 电子书工具
     'nav.ebook_tools': '电子书工具',

@@ -1,4 +1,4 @@
-import CSVTool from '@/components/CSVTool'
+import CSVDeduplicate from '@/components/CSVDeduplicate'
 import CSVToolInfo from '@/components/CSVToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangCsvDeduplicatePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <CSVTool toolKey="csv_deduplicate" />
+      <CSVDeduplicate />
       <CSVToolInfo toolKey="csv_deduplicate" exampleImages={exampleImages} />
       <CTA />
     </div>

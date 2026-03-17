@@ -1166,6 +1166,9 @@ export default {    'nav.home': 'ホーム',
     'csv_deduplicate.download': 'ダウンロード',
     'csv_deduplicate.copy': 'コピー',
     'csv_deduplicate.edit': 'やり直す',
+    'csv_deduplicate.columns': '列',
+    'csv_deduplicate.rows': '行',
+    'csv_deduplicate.error': '重複の削除中にエラーが発生しました',
 
     // 電子書籍ツール
     'nav.ebook_tools': '電子書籍ツール',

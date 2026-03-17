@@ -824,6 +824,9 @@ export default {    'nav.home': 'Home',
     'csv_deduplicate.download': 'Download',
     'csv_deduplicate.copy': 'Copy',
     'csv_deduplicate.edit': 'Start Over',
+    'csv_deduplicate.columns': 'columns',
+    'csv_deduplicate.rows': 'rows',
+    'csv_deduplicate.error': 'An error occurred during deduplication',
 
     // eBook Tools
     'nav.ebook_tools': 'eBook Tools',
