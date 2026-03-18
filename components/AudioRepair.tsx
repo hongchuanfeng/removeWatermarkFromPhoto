@@ -99,7 +99,7 @@ export default function AudioRepair() {
     return new Blob([arrayBuffer], { type: 'audio/wav' })
   }
 
-  const applyNoiseReduction = (channelData: Float32Array, sampleRate: number): Float32Array => {
+  const applyNoiseReduction = (channelData: Float32Array<ArrayBufferLike>, sampleRate: number): Float32Array<ArrayBufferLike> => {
     const windowSize = 2048
     const noiseThreshold = 0.02
     const result = new Float32Array(channelData.length)
@@ -125,7 +125,7 @@ export default function AudioRepair() {
     return result
   }
 
-  const applyClickRemoval = (channelData: Float32Array, sampleRate: number): Float32Array => {
+  const applyClickRemoval = (channelData: Float32Array<ArrayBufferLike>, sampleRate: number): Float32Array<ArrayBufferLike> => {
     const result = new Float32Array(channelData.length)
     const windowSize = 51
 
@@ -154,7 +154,7 @@ export default function AudioRepair() {
     return result
   }
 
-  const applyAudioEnhancement = (channelData: Float32Array, sampleRate: number): Float32Array => {
+  const applyAudioEnhancement = (channelData: Float32Array<ArrayBufferLike>, sampleRate: number): Float32Array<ArrayBufferLike> => {
     const result = new Float32Array(channelData.length)
 
     let maxSample = 0
