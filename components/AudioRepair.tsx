@@ -206,7 +206,7 @@ export default function AudioRepair() {
 
       for (let channel = 0; channel < numberOfChannels; channel++) {
         const channelData = audioBuffer.getChannelData(channel)
-        const processedData = new Float32Array(channelData) as Float32Array
+        let processedData = new Float32Array(channelData) as Float32Array
 
         if (repairOptions.noiseReduction) {
           setProgress(60 + channel * 10)
