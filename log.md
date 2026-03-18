@@ -193,3 +193,215 @@
 - `text_to_subtitles.edit`: 重新编辑
 - `text_to_subtitles.preview`: 预览
 - `text_to_subtitles.and_more`: 还有...段
+
+---
+
+## 音频转文字功能实现记录
+
+### 完成时间
+2026-03-18
+
+### 需求
+/audio-to-text，实现该页面的音频转文字功能，请实现。
+
+### 实现内容
+
+### 1. 组件功能实现
+- 文件路径：`components/AudioToText.tsx`
+- 实现了以下功能：
+  - 音频文件上传（支持 MP3, WAV, AAC, FLAC, M4A 等格式）
+  - 音频预览播放
+  - 语音识别语言选择（支持12种语言）
+  - 使用浏览器 Web Speech API 进行语音识别
+  - 实时显示转录进度
+  - 转录结果展示
+  - 复制文本功能
+  - 下载文本文件功能
+  - 重新转录功能
+
+### 2. 语音识别支持的语言
+- English (US/UK)
+- 中文（简体/繁体）
+- Español
+- Français
+- Deutsch
+- 日本語
+- 한국어
+- Português
+- Русский
+- العربية
+
+### 3. 页面路由
+- 文件路径：`app/[lang]/audio-to-text/page.tsx`
+- 包含示例图片：/audio/text/1.jpg, /audio/text/2.jpg, /audio/text/3.jpg
+
+### 4. 多语言支持
+所有支持的语言已实现完整的 audio_to_text 多语言翻译：
+- 中文 (zh.ts) - 已实现
+- 英文 (en.ts) - 已实现
+- 西班牙语 (es.ts) - 已实现
+- 法语 (fr.ts) - 已实现
+- 日语 (ja.ts) - 已实现
+- 德语 (de.ts) - 已实现
+- 葡萄牙语 (pt.ts) - 已实现
+- 韩语 (ko.ts) - 已实现
+- 俄语 (ru.ts) - 已实现
+- 阿拉伯语 (ar.ts) - 已实现
+
+### 5. 多语言翻译内容
+- 导航标题：`nav.audio_to_text`
+- 功能描述：`audio_to_text.description`
+- 上传提示：`audio_to_text.upload`
+- 支持格式：`audio_to_text.supported`
+- 转换按钮：`audio_to_text.convert`
+- 处理中：`audio_to_text.processing`
+- 预览：`audio_to_text.preview`
+- 选择语言：`audio_to_text.select_language`
+- 结果标题：`audio_to_text.result_title`
+- 复制文本：`audio_to_text.copy`
+- 下载文本：`audio_to_text.download`
+- 继续转录：`audio_to_text.another`
+- 使用帮助（how_to_use_title, how_to_use_step1-4）
+- 常见问题（faq_title, faq_q1-5, faq_a1-5）
+
+---
+
+## 音频转字幕功能实现记录
+
+### 完成时间
+2026-03-18
+
+### 需求
+/audio-to-subtitles，实现该页面的音频转字幕功能，请实现。
+
+### 实现内容
+
+### 1. 组件功能实现
+- 文件路径：`components/AudioToSubtitles.tsx`
+- 实现了以下功能：
+  - 音频文件上传（支持 MP3, WAV, AAC, FLAC, M4A 等格式）
+  - 音频预览播放
+  - 语音识别语言选择（支持12种语言）
+  - 字幕格式选择（SRT, VTT, ASS, TXT）
+  - 使用浏览器 Web Speech API 进行语音识别
+  - 实时显示处理进度
+  - 生成带时间轴的字幕内容
+  - 复制字幕功能
+  - 下载字幕文件功能
+  - 重新生成功能
+
+### 2. 支持的字幕格式
+- **SRT**：SubRip Text - 通用字幕格式
+- **VTT**：WebVTT - Web字幕格式
+- **ASS**：Advanced SubStation Alpha - 样式化字幕
+- **TXT**：Plain Text - 纯文本格式
+
+### 3. 语音识别支持的语言
+- English (US/UK)
+- 中文（简体/繁体）
+- Español
+- Français
+- Deutsch
+- 日本語
+- 한국어
+- Português
+- Русский
+- العربية
+
+### 4. 页面路由
+- 文件路径：`app/[lang]/audio-to-subtitles/page.tsx`
+- 包含示例图片：/audio/subtitles/1.jpg, /audio/subtitles/2.jpg, /audio/subtitles/3.jpg
+
+### 5. 多语言支持
+所有支持的语言已实现完整的 audio_to_subtitles 多语言翻译：
+- 中文 (zh.ts) - 已实现
+- 英文 (en.ts) - 已实现
+- 西班牙语 (es.ts) - 已实现
+- 法语 (fr.ts) - 已实现
+- 日语 (ja.ts) - 已实现
+- 德语 (de.ts) - 已实现
+- 葡萄牙语 (pt.ts) - 已实现
+- 韩语 (ko.ts) - 已实现
+- 俄语 (ru.ts) - 已实现
+- 阿拉伯语 (ar.ts) - 已实现
+
+### 6. 多语言翻译内容
+- 导航标题：`nav.audio_to_subtitles`
+- 功能描述：`audio_to_subtitles.description`
+- 上传提示：`audio_to_subtitles.upload`
+- 支持格式：`audio_to_subtitles.supported`
+- 转换按钮：`audio_to_subtitles.convert`
+- 处理中：`audio_to_subtitles.processing`
+- 预览：`audio_to_subtitles.preview`
+- 选择语言：`audio_to_subtitles.select_language`
+- 字幕格式：`audio_to_subtitles.format`
+- 结果标题：`audio_to_subtitles.result_title`
+- 复制字幕：`audio_to_subtitles.copy`
+- 下载字幕：`audio_to_subtitles.download`
+- 继续生成：`audio_to_subtitles.another`
+- 使用帮助（how_to_use_title, how_to_use_step1-4）
+- 常见问题（faq_title, faq_q1-5, faq_a1-5）
+
+---
+
+## 音频修复功能实现记录
+
+### 完成时间
+2026-03-18
+
+### 需求
+/audio-repair，实现该页面的音频修复功能，请实现。
+
+### 实现内容
+
+### 1. 组件功能实现
+- 文件路径：`components/AudioRepair.tsx`
+- 实现了以下功能：
+  - 音频文件上传（支持 MP3, WAV, AAC, FLAC, M4A 等格式）
+  - 音频预览播放
+  - 问题类型选择（背景噪音、爆音、电流声、削波、混响）
+  - 音频处理和降噪
+  - 实时显示处理进度
+  - 修复后音频预览
+  - 下载修复后的音频
+  - 继续修复功能
+
+### 2. 支持修复的问题类型
+- 背景噪音 (Background Noise)
+- 爆音与杂音 (Clicks & Pops)
+- 电流嗡嗡声 (Electrical Hum)
+- 削波失真 (Clipping)
+- 混响/回声 (Reverb/Echo)
+
+### 3. 页面路由
+- 文件路径：`app/[lang]/audio-repair/page.tsx`
+- 包含示例图片：/audio/repair/1.jpg, /audio/repair/2.jpg, /audio/repair/3.jpg
+
+### 4. 多语言支持
+所有支持的语言已实现完整的 audio_repair 多语言翻译：
+- 中文 (zh.ts) - 已实现
+- 英文 (en.ts) - 已实现
+- 西班牙语 (es.ts) - 已实现
+- 法语 (fr.ts) - 已实现
+- 日语 (ja.ts) - 已实现
+- 德语 (de.ts) - 已实现
+- 葡萄牙语 (pt.ts) - 已实现
+- 韩语 (ko.ts) - 已实现
+- 俄语 (ru.ts) - 已实现
+- 阿拉伯语 (ar.ts) - 已实现
+
+### 5. 多语言翻译内容
+- 导航标题：`nav.audio_repair`
+- 原始音频：`audio_repair.original_audio`
+- 选择问题：`audio_repair.select_issues`
+- 背景噪音：`audio_repair.background_noise`
+- 爆音与杂音：`audio_repair.clicks_pops`
+- 电流嗡嗡声：`audio_repair.hum`
+- 削波失真：`audio_repair.clipping`
+- 混响/回声：`audio_repair.reverb`
+- 修复完成：`audio_repair.result_title`
+- 修复后的音频：`audio_repair.repaired_audio`
+- 下载修复后的音频：`audio_repair.download`
+- 继续修复：`audio_repair.another`
+- 使用帮助（how_to_use_title, how_to_use_step1-4）
+- 常见问题（faq_title, faq_q1-5, faq_a1-5）

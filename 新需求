@@ -642,3 +642,31 @@ Type error: An object literal cannot have multiple properties with the same name
   /csv-split，实现该页面的csv文件拆分，请实现。
 
   /csv-deduplicate，实现该页面的csv去重功能，请实现。
+
+  /audio-clip-merge，实现该页面的音频合并功能，请实现。
+
+  
+  /audio-format-conversion，实现该页面的音频格式转换功能，请实现。
+
+
+  /vocal-separation，实现该页面的音频人声分离功能，请实现。
+
+  /audio-to-text，实现该页面的音频转文字功能，请实现。
+
+
+  /audio-to-subtitles，实现该页面的音频转字幕功能，请实现。
+
+
+  /audio-repair，实现该页面的音频修复功能，请实现。
+
+
+  /qrcode-generate，实现该页面的生成单个二维码和批量生成二维码，请实现。
+
+
+  /qrcode-recognize，实现该页面的识别二维码的功能，请实现。
+
+
+  /barcode-generate，实现该页面的生成单个条码和批量生成条码，将“输入数据或数字”的文本框的字体颜色改为黑色，请实现。
+
+
+  /barcode-recognize，实现该页面的识别条码的功能，请实现。

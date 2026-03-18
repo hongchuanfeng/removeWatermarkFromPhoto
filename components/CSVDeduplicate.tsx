@@ -16,7 +16,6 @@ export default function CSVDeduplicate() {
   const [processing, setProcessing] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState('')
   const [deduplicatedContent, setDeduplicatedContent] = useState('')
-  const [selectedColumns, setSelectedColumns] = useState<number[]>([])
   const [keepFirst, setKeepFirst] = useState(true)
   const [caseSensitive, setCaseSensitive] = useState(false)
   const [stats, setStats] = useState<{ original: number; duplicates: number; remaining: number } | null>(null)
@@ -85,7 +84,6 @@ export default function CSVDeduplicate() {
         const content = event.target?.result as string
         const { headers, rows } = parseCSV(content)
         setParsedCSV({ name: selectedFile.name, headers, rows })
-        setSelectedColumns(headers.map((_, i) => i))
       }
       reader.readAsText(selectedFile)
     }
@@ -103,40 +101,20 @@ export default function CSVDeduplicate() {
     }
   }
 
-  const handleColumnToggle = (index: number) => {
-    setSelectedColumns(prev => {
-      if (prev.includes(index)) {
-        return prev.filter(i => i !== index)
-      } else {
-        return [...prev, index]
-      }
-    })
-  }
-
-  const handleSelectAllColumns = () => {
-    if (parsedCSV) {
-      setSelectedColumns(parsedCSV.headers.map((_, i) => i))
-    }
-  }
-
   const handleDeduplicate = async () => {
-    if (!parsedCSV || selectedColumns.length === 0) return
+    if (!parsedCSV) return
     setProcessing(true)
     setError('')
     
     try {
-      const columnsToCheck = selectedColumns
       const seen = new Map<string, number>()
       const duplicateIndices = new Set<number>()
       
       parsedCSV.rows.forEach((row, index) => {
-        const key = columnsToCheck.map(colIndex => {
-          let value = row[colIndex] || ''
-          if (!caseSensitive) {
-            value = value.toLowerCase()
-          }
-          return value
-        }).join('|||')
+        let key = row.join('|||')
+        if (!caseSensitive) {
+          key = key.toLowerCase()
+        }
         
         if (seen.has(key)) {
           duplicateIndices.add(index)
@@ -252,43 +230,6 @@ export default function CSVDeduplicate() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-700">{t('csv_deduplicate.select_columns')}</h3>
-                <p className="text-sm text-gray-500">{t('csv_deduplicate.select_columns_hint')}</p>
-                
-                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={handleSelectAllColumns}
-                      className="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-full hover:bg-primary-200 transition"
-                    >
-                      {t('csv_deduplicate.all_columns')}
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {parsedCSV.headers.map((header, index) => (
-                      <label
-                        key={index}
-                        className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition ${
-                          selectedColumns.includes(index)
-                            ? 'bg-primary-50 border border-primary-500'
-                            : 'bg-white border border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedColumns.includes(index)}
-                          onChange={() => handleColumnToggle(index)}
-                          className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                        />
-                        <span className="text-sm text-gray-700 truncate" title={header}>
-                          {header}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                   <div>
                     <label className="block text-gray-700 font-semibold mb-2">
@@ -335,7 +276,7 @@ export default function CSVDeduplicate() {
 
                 <button
                   onClick={handleDeduplicate}
-                  disabled={processing || selectedColumns.length === 0}
+                  disabled={processing}
                   className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400"
                 >
                   {processing ? t('csv_deduplicate.processing') : t('csv_deduplicate.process')}
