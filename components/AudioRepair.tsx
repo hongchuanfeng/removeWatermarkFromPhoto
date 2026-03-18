@@ -206,7 +206,7 @@ export default function AudioRepair() {
 
       for (let channel = 0; channel < numberOfChannels; channel++) {
         const channelData = audioBuffer.getChannelData(channel)
-        let processedData: Float32Array<ArrayBufferLike> = new Float32Array(channelData)
+        const processedData = new Float32Array(channelData) as Float32Array
 
         if (repairOptions.noiseReduction) {
           setProgress(60 + channel * 10)
@@ -453,7 +453,7 @@ export default function AudioRepair() {
                         </h4>
                         <audio
                           controls
-                          src={audioUrl}
+                          src={audioUrl ?? undefined}
                           className="w-full mb-3"
                         />
                       </div>
@@ -465,7 +465,7 @@ export default function AudioRepair() {
                         </h4>
                         <audio
                           controls
-                          src={repairedAudioUrl}
+                          src={repairedAudioUrl ?? undefined}
                           className="w-full mb-3"
                         />
                         <button
