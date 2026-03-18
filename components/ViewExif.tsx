@@ -112,7 +112,8 @@ export default function ViewExif() {
           setImageDimensions({ width: img.width, height: img.height })
           
           // 提取 EXIF 数据
-          EXIF.getData(img as any, function() {
+          const imgEl = img as any
+          EXIF.getData(imgEl, function(this: any) {
             const exif: ExifInfo = {}
             let hasData = false
             
