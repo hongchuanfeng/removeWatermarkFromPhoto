@@ -56,7 +56,7 @@ export default function BarcodeRecognize({ toolKey }: BarcodeRecognizeProps) {
         verbose: false
       }
 
-      const result = await html5QrCode.scanFile(imageSrc, configs)
+      const result = await html5QrCode.scanDataUrl(imageSrc, configs)
       const decodedTexts: string[] = []
       result.forEach((item) => {
         if (item.decodedText && !decodedTexts.includes(item.decodedText)) {
