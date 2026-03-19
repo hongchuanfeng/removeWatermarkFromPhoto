@@ -57,17 +57,11 @@ export default function BarcodeRecognize({ toolKey }: BarcodeRecognizeProps) {
       const blob = await response.blob()
       const file = new File([blob], 'image.png', { type: 'image/png' })
       
-      // scanFile 返回的是 Html5QrcodeResult 数组，每个元素都有 decodedText 属性
-      const scanResults = await html5QrCode.scanFile(file, false) as { decodedText: string }[]
+      const scanResult: string = await html5QrCode.scanFile(file, false)
       const decodedTexts: string[] = []
       
-      // 处理扫描结果
-      if (scanResults && scanResults.length > 0) {
-        scanResults.forEach((result) => {
-          if (result?.decodedText) {
-            decodedTexts.push(result.decodedText)
-          }
-        })
+      if (scanResult) {
+        decodedTexts.push(scanResult)
       }
       
       return decodedTexts
