@@ -36,37 +36,40 @@ export default function BarcodeRecognize({ toolKey }: BarcodeRecognizeProps) {
   }, [])
 
   const recognizeBarcodeFromImage = async (imageSrc: string): Promise<string[]> => {
-    const html5QrCode = new Html5Qrcode('barcode-reader')
+    const formatsToSupport = [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.ITF,
+      Html5QrcodeSupportedFormats.CODE_93,
+      Html5QrcodeSupportedFormats.CODABAR,
+      Html5QrcodeSupportedFormats.QR_CODE,
+    ]
+
+    const html5QrCode = new Html5Qrcode('barcode-reader', { formatsToSupport, verbose: false })
     html5QrcodeRef.current = html5QrCode
 
     try {
-      const configs = {
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.ITF,
-          Html5QrcodeSupportedFormats.CODE_93,
-          Html5QrcodeSupportedFormats.CODABAR,
-          Html5QrcodeSupportedFormats.QR_CODE,
-        ],
-        verbose: false
-      }
-
-      // Convert data URL to File object
       const response = await fetch(imageSrc)
       const blob = await response.blob()
       const file = new File([blob], 'image.png', { type: 'image/png' })
-      const result = await html5QrCode.scanFile(file, configs)
+      
+      // scanFile 返回的是 Html5QrcodeResult 数组，每个元素都有 decodedText 属性
+      const scanResults = await html5QrCode.scanFile(file, false) as { decodedText: string }[]
       const decodedTexts: string[] = []
-      result.forEach((item) => {
-        if (item.decodedText && !decodedTexts.includes(item.decodedText)) {
-          decodedTexts.push(item.decodedText)
-        }
-      })
+      
+      // 处理扫描结果
+      if (scanResults && scanResults.length > 0) {
+        scanResults.forEach((result) => {
+          if (result?.decodedText) {
+            decodedTexts.push(result.decodedText)
+          }
+        })
+      }
+      
       return decodedTexts
     } catch (err) {
       console.error('Error scanning barcode:', err)
@@ -259,6 +262,9 @@ export default function BarcodeRecognize({ toolKey }: BarcodeRecognizeProps) {
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
+          {/* Hidden div required by Html5Qrcode library */}
+          <div id="barcode-reader" className="hidden"></div>
+          
           {/* Mode Toggle */}
           <div className="flex justify-center mb-6">
             <div className="inline-flex rounded-md shadow-sm" role="group">

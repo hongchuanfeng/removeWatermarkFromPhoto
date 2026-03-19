@@ -670,3 +670,7 @@ Type error: An object literal cannot have multiple properties with the same name
 
 
   /barcode-recognize，实现该页面的识别条码的功能，请实现。
+
+
+
+  /barcode-recognize, 这个页面识别失败，请修改
