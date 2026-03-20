@@ -673,4 +673,17 @@ Type error: An object literal cannot have multiple properties with the same name
 
 
 
-  /barcode-recognize, 这个页面识别失败，请修改
+  /barcode-recognize, 这个页面识别失败，请修改这个页面，识别成功后，将识别结果显示在页面上，请实现。
+
+  /ebook-merge，实现该页面电子书合并功能。
+
+
+  PDF&CSV&电子书 在这个二级菜单下面再添加一个“文档转为电子书”的二级菜单，请实现。
+
+
+  /ebook-watermark-removal, 实现该页面的电子书去水印功能，请实现。
+
+  /ebook-to-speech，实现电子书转为语音功能，请实现。
+
+
+  /document-to-ebook，这个页面实现文档转为电子书失败，请检查下代码，然后修改。

@@ -141,7 +141,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="hover:text-white transition mt-2 inline-block"
           >
-            工业和信息化部 粤ICP备18041392号-5
+            粤ICP备2026028564号-2
           </a>
         </div>
       </div>

@@ -554,6 +554,13 @@ export default function Navbar() {
                           {t('nav.ebook_merge')}
                         </Link>
                         <Link 
+                          href={getLangPath('/document-to-ebook', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.document_to_ebook')}
+                        </Link>
+                        <Link 
                           href={getLangPath('/ebook-watermark-removal', language)} 
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
@@ -1040,6 +1047,9 @@ export default function Navbar() {
                   </div>
                   <Link href={getLangPath('/ebook-merge', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.ebook_merge')}
+                  </Link>
+                  <Link href={getLangPath('/document-to-ebook', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.document_to_ebook')}
                   </Link>
                   <Link href={getLangPath('/ebook-watermark-removal', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.ebook_watermark_removal')}
