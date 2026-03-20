@@ -242,21 +242,18 @@ ${content}
 </html>`
       zip.file('OEBPS/chapter1.xhtml', chapterXhtml)
       
-      // Generate the ZIP file as a uint8array first
-      const zipData = await zip.generateAsync({
-        type: 'uint8array',
+      // Generate the ZIP file
+      const zipBlob = await zip.generateAsync({
+        type: 'blob',
         mimeType: 'application/epub+zip',
         compression: 'DEFLATE',
         compressionOptions: { level: 9 },
         platform: 'DOS'
-      })
+      }) as Blob
       
-      // Create blob from uint8array
-      const blob = new Blob([zipData], { type: 'application/epub+zip' })
+      console.log('DEBUG: ePub generated successfully, size:', zipBlob.size)
       
-      console.log('DEBUG: ePub generated successfully, size:', blob.size)
-      
-      return blob
+      return zipBlob
     } catch (error) {
       console.error('Error creating ePub:', error)
       throw error
