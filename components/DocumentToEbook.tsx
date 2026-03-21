@@ -251,8 +251,6 @@ ${content}
         platform: 'DOS'
       }) as Blob
       
-      console.log('DEBUG: ePub generated successfully, size:', zipBlob.size)
-      
       return zipBlob
     } catch (error) {
       console.error('Error creating ePub:', error)
@@ -280,55 +278,64 @@ ${content}
       setProgress(10)
       
       const fileName = file.name.replace(/\.[^/.]+$/, '')
-      let fileContent = await file.text()
+      const fileContent = await file.text()
       
-      console.log('DEBUG: File name:', file.name)
-      console.log('DEBUG: File size:', file.size)
-      console.log('DEBUG: File type:', file.type)
-      console.log('DEBUG: File content length:', fileContent.length)
-      console.log('DEBUG: First 100 chars:', fileContent.substring(0, 100))
+      console.log('[DocumentToEbook] ===== DEBUG START =====')
+      console.log('[DocumentToEbook] File name:', file.name)
+      console.log('[DocumentToEbook] File size:', file.size)
+      console.log('[DocumentToEbook] File type:', file.type)
+      console.log('[DocumentToEbook] File content length:', fileContent.length)
+      console.log('[DocumentToEbook] File content preview:', fileContent.substring(0, 200))
+      console.log('[DocumentToEbook] File content preview (full lines):', JSON.stringify(fileContent.substring(0, 200)))
       
       setProgress(20)
       
       const ext = file.name.toLowerCase().split('.').pop()
-      console.log('DEBUG: File extension:', ext)
+      console.log('[DocumentToEbook] File extension:', ext)
       let htmlContent = ''
       
       // Handle different file types
       if (ext === 'md' || ext === 'markdown') {
-        console.log('DEBUG: Parsing as Markdown')
+        console.log('[DocumentToEbook] Parsing as Markdown')
         htmlContent = parseMarkdown(fileContent)
       } else if (ext === 'docx') {
-        console.log('DEBUG: Parsing as DOCX')
+        console.log('[DocumentToEbook] Parsing as DOCX')
         try {
           const mammoth = await import('mammoth')
           const arrayBuffer = await file.arrayBuffer()
           const result = await mammoth.convertToHtml({ arrayBuffer })
           htmlContent = result.value
-          console.log('DEBUG: Mammoth conversion result length:', result.value.length)
         } catch (mammothError) {
-          console.error('Mammoth error:', mammothError)
+          console.error('[DocumentToEbook] Mammoth error:', mammothError)
           htmlContent = textToHtml(fileContent)
         }
       } else if (ext === 'pdf') {
-        console.log('DEBUG: Parsing as PDF')
+        console.log('[DocumentToEbook] Parsing as PDF')
         // For PDF, we'll use raw text extraction
         htmlContent = textToHtml(fileContent)
       } else {
         // Plain text, etc.
-        console.log('DEBUG: Parsing as plain text')
+        console.log('[DocumentToEbook] Parsing as plain text')
+        console.log('[DocumentToEbook] Before textToHtml, content length:', fileContent.length)
         htmlContent = textToHtml(fileContent)
+        console.log('[DocumentToEbook] After textToHtml, HTML length:', htmlContent.length)
+        console.log('[DocumentToEbook] After textToHtml, HTML preview:', htmlContent.substring(0, 200))
       }
       
-      console.log('DEBUG: HTML content length:', htmlContent.length)
-      console.log('DEBUG: HTML first 200 chars:', htmlContent.substring(0, 200))
+      console.log('[DocumentToEbook] Final HTML content length:', htmlContent.length)
+      console.log('[DocumentToEbook] Final HTML content:', htmlContent.substring(0, 300))
+      
+      if (!htmlContent || htmlContent.trim().length === 0) {
+        console.log('[DocumentToEbook] ERROR: HTML content is empty!')
+        throw new Error(t('document_to_ebook.no_content'))
+      }
       
       setProgress(50)
       
       // Create ePub
-      console.log('DEBUG: Creating ePub...')
+      console.log('[DocumentToEbook] Creating ePub...')
       const epubBlob = await createEpub(fileName, htmlContent)
-      console.log('DEBUG: ePub created, size:', epubBlob.size)
+      console.log('[DocumentToEbook] ePub created, size:', epubBlob.size)
       
       setProgress(90)
       
@@ -336,8 +343,9 @@ ${content}
       setDownloadUrl(url)
       
       setProgress(100)
+      console.log('[DocumentToEbook] ===== DEBUG END =====')
     } catch (err: any) {
-      console.error('Conversion error:', err)
+      console.error('[DocumentToEbook] Conversion error:', err)
       setError(err.message || t('document_to_ebook.convert_failed'))
     }
 

@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFToTextTool from '@/components/PDFToTextTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangPdfToTextPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_to_text" />
+      <PDFToTextTool toolKey="pdf_to_text" />
       <PDFToolInfo toolKey="pdf_to_text" exampleImages={exampleImages} />
       <CTA />
     </div>

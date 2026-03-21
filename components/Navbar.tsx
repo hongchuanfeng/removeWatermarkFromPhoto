@@ -651,6 +651,27 @@ export default function Navbar() {
                         >
                           {t('nav.pdf_translate')}
                         </Link>
+                        <Link 
+                          href={getLangPath('/document-to-pdf', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.document_to_pdf')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-add-watermark', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_add_watermark')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/pdf-remove-watermark', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.pdf_remove_watermark')}
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1091,6 +1112,15 @@ export default function Navbar() {
                   </Link>
                   <Link href={getLangPath('/pdf-translate', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.pdf_translate')}
+                  </Link>
+                  <Link href={getLangPath('/document-to-pdf', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.document_to_pdf')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-add-watermark', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_add_watermark')}
+                  </Link>
+                  <Link href={getLangPath('/pdf-remove-watermark', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.pdf_remove_watermark')}
                   </Link>
                 </div>
               )}

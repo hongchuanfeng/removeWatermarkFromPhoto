@@ -1,4 +1,4 @@
-import EbookTool from '@/components/EbookTool'
+import EbookSubtitlesTool from '@/components/EbookSubtitlesTool'
 import EbookToolInfo from '@/components/EbookToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangEbookSubtitlesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <EbookTool toolKey="ebook_subtitles" />
+      <EbookSubtitlesTool toolKey="ebook-subtitles" />
       <EbookToolInfo toolKey="ebook_subtitles" exampleImages={exampleImages} />
       <CTA />
     </div>

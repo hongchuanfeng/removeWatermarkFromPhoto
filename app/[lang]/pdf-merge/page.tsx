@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFMergeTool from '@/components/PDFMergeTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangPdfMergePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_merge" />
+      <PDFMergeTool toolKey="pdf-merge" />
       <PDFToolInfo toolKey="pdf_merge" exampleImages={exampleImages} />
       <CTA />
     </div>

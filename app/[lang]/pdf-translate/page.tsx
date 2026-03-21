@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFTranslateTool from '@/components/PDFTranslateTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,10 +17,9 @@ export default function LangPdfTranslatePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_translate" />
+      <PDFTranslateTool toolKey="pdf_translate" />
       <PDFToolInfo toolKey="pdf_translate" exampleImages={exampleImages} />
       <CTA />
     </div>
   )
 }
-

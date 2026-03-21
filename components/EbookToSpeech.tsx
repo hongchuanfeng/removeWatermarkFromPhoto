@@ -1,19 +1,44 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function EbookToSpeech() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [file, setFile] = useState<File | null>(null)
   const [processing, setProcessing] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState('')
   const [error, setError] = useState('')
   const [progress, setProgress] = useState(0)
-  const [voice, setVoice] = useState('alloy')
   const [speed, setSpeed] = useState(1.0)
   const [extractedText, setExtractedText] = useState('')
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [selectedVoice, setSelectedVoice] = useState('')
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Load available voices
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices()
+      setAvailableVoices(voices)
+      // Set default voice based on language
+      const langPrefix = lang === 'zh' ? 'zh' : lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'
+      const defaultVoice = voices.find(v => v.lang.startsWith(langPrefix)) || voices[0]
+      if (defaultVoice) {
+        setSelectedVoice(defaultVoice.name)
+      }
+    }
+
+    loadVoices()
+    window.speechSynthesis.onvoiceschanged = loadVoices
+
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null
+    }
+  }, [lang])
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + ' B'
@@ -36,6 +61,7 @@ export default function EbookToSpeech() {
     setError('')
     setProgress(0)
     setExtractedText('')
+    setAudioBlob(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -57,7 +83,7 @@ export default function EbookToSpeech() {
     const xhtmlFiles = Object.keys(files).filter(name => 
       (name.endsWith('.xhtml') || name.endsWith('.html') || name.endsWith('.htm')) &&
       !name.includes('nav') && !name.includes('toc')
-    )
+    ).sort()
     
     for (const fileName of xhtmlFiles) {
       const content = await zip.file(fileName)?.async('string')
@@ -72,10 +98,12 @@ export default function EbookToSpeech() {
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
           .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&apos;/g, "'")
           .replace(/\s+/g, ' ')
           .trim()
         
-        if (text.length > 50) {
+        if (text.length > 20) {
           fullText += text + '\n\n'
         }
       }
@@ -86,14 +114,12 @@ export default function EbookToSpeech() {
 
   const extractTextFromFile = async (file: File): Promise<string> => {
     const fileName = file.name.toLowerCase()
-    const ext = fileName.split('.').pop() || ''
     
     try {
       if (fileName.endsWith('.epub')) {
         return await extractTextFromEpub(file)
-      } else if (fileName.endsWith('.txt') || fileName.endsWith('.md') || ext === 'txt' || ext === 'md') {
-        const content = await file.text()
-        return content
+      } else if (fileName.endsWith('.txt') || fileName.endsWith('.md')) {
+        return await file.text()
       }
     } catch (err) {
       console.error('Error extracting text:', err)
@@ -102,53 +128,13 @@ export default function EbookToSpeech() {
     return ''
   }
 
-  const textToSpeech = async (text: string, voiceName: string, speechRate: number): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const synth = window.speechSynthesis
-      const voices = synth.getVoices()
-      
-      // Find the requested voice
-      let selectedVoice = voices.find(v => v.name.toLowerCase().includes(voiceName.toLowerCase()))
-      
-      // Fallback to default if not found
-      if (!selectedVoice) {
-        selectedVoice = voices.find(v => v.lang.startsWith('en')) || voices[0]
-      }
-      
-      // Use Web Speech API to generate audio
-      // Since Web Speech API doesn't directly generate audio files,
-      // we'll use a workaround with AudioContext
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.voice = selectedVoice
-      utterance.rate = speechRate
-      utterance.lang = selectedVoice?.lang || 'en-US'
-      
-      // Create a MediaRecorder to capture audio
-      const audioContext = new AudioContext()
-      const mediaStream = audioContext.createMediaStreamDestination()
-      
-      // Since speechSynthesis doesn't provide audio stream directly,
-      // we'll create a workaround using silence and provide instructions
-      
-      // For a production app, you would use a TTS API like:
-      // - Google Cloud Text-to-Speech
-      // - AWS Polly
-      // - ElevenLabs
-      // - Web Speech API (limited)
-      
-      // For now, we'll use the Web Speech API
-      synth.speak(utterance)
-      
-      // Return a placeholder - actual implementation would need server-side TTS
-      resolve(new Blob(['Audio placeholder'], { type: 'audio/mp3' }))
-    })
-  }
-
   const handleConvert = async () => {
     if (!file) return
     setProcessing(true)
     setError('')
     setProgress(0)
+    setAudioBlob(null)
+    setDownloadUrl('')
 
     try {
       setProgress(10)
@@ -156,10 +142,8 @@ export default function EbookToSpeech() {
       // Extract text from ebook
       const text = await extractTextFromFile(file)
       
-      // Show error with file info
       if (!text || text.trim().length === 0) {
-        const errorMsg = `未找到可转换的文本内容。文件: ${file.name}, 类型: ${file.type || 'unknown'}, 长度: ${text?.length || 0}`
-        setError(errorMsg)
+        setError(t('ebook_to_speech.no_content') || '未找到可转换的文本内容')
         setProcessing(false)
         return
       }
@@ -168,88 +152,167 @@ export default function EbookToSpeech() {
       
       setProgress(30)
       
-      // Use Web Speech API with MediaRecorder to capture audio
+      // Check if Web Speech API is supported
+      if (!('speechSynthesis' in window)) {
+        setError(t('ebook_to_speech.not_supported') || '您的浏览器不支持语音合成')
+        setProcessing(false)
+        return
+      }
+      
       const synth = window.speechSynthesis
       const voices = synth.getVoices()
       
-      // Find appropriate voice
-      let selectedVoice = voices.find(v => v.lang.startsWith('zh')) || 
-                          voices.find(v => v.name.toLowerCase().includes(voice.toLowerCase())) ||
-                          voices[0]
+      // Find selected voice
+      let voice = voices.find(v => v.name === selectedVoice) || 
+                  voices.find(v => v.lang.startsWith('zh')) ||
+                  voices[0]
       
-      // Split text into chunks for speech
-      const chunkSize = 5000
+      if (!voice) {
+        setError(t('ebook_to_speech.no_voice') || '未找到可用的语音')
+        setProcessing(false)
+        return
+      }
+      
+      setProgress(40)
+      
+      // Split text into manageable chunks
+      const maxChunkLength = 8000 // Limit per utterance
+      const sentences = text.match(/[^.!?。！？\n]+[.!?。！？\n]*/g) || [text]
       const chunks: string[] = []
-      
-      // Split by sentences
-      const sentences = text.match(/[^.!?。！？]+[.!?。！？]+/g) || [text]
       let currentChunk = ''
       
       for (const sentence of sentences) {
-        if ((currentChunk + sentence).length > chunkSize) {
-          if (currentChunk) chunks.push(currentChunk.trim())
+        if ((currentChunk + sentence).length > maxChunkLength) {
+          if (currentChunk.trim()) chunks.push(currentChunk.trim())
           currentChunk = sentence
         } else {
           currentChunk += sentence
         }
       }
-      if (currentChunk) chunks.push(currentChunk.trim())
+      if (currentChunk.trim()) chunks.push(currentChunk.trim())
       
-      setProgress(50)
-      
-      // Set up audio recording
-      const audioContext = new AudioContext()
-      const destination = audioContext.createMediaStreamDestination()
-      const mediaRecorder = new MediaRecorder(destination.stream)
-      const audioChunks: Blob[] = []
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunks.push(event.data)
+      // Clean up any remaining chunks that are too long
+      const finalChunks: string[] = []
+      for (const chunk of chunks) {
+        if (chunk.length > maxChunkLength) {
+          // Split long chunks by character count
+          for (let i = 0; i < chunk.length; i += maxChunkLength) {
+            const subChunk = chunk.substring(i, i + maxChunkLength).trim()
+            if (subChunk) finalChunks.push(subChunk)
+          }
+        } else {
+          finalChunks.push(chunk)
         }
       }
       
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
-        const url = URL.createObjectURL(audioBlob)
-        setDownloadUrl(url)
-        setProgress(100)
-        setProcessing(false)
+      setProgress(50)
+
+      // Setup audio recording using AudioContext and MediaRecorder
+      let audioContext: AudioContext | null = null
+      let mediaRecorder: MediaRecorder | null = null
+      audioChunksRef.current = []
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        audioContext = new AudioContext()
+        const source = audioContext.createMediaStreamSource(stream)
+        
+        // Use DynamicsCompressorNode to normalize audio
+        const compressor = audioContext.createDynamicsCompressor()
+        compressor.threshold.value = -24
+        compressor.knee.value = 30
+        compressor.ratio.value = 12
+        compressor.attack.value = 0.003
+        compressor.release.value = 0.25
+        
+        source.connect(compressor)
+        compressor.connect(audioContext.destination)
+        
+        mediaRecorder = new MediaRecorder(stream)
+        mediaRecorderRef.current = mediaRecorder
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data)
+          }
+        }
+
+        mediaRecorder.start()
+      } catch (err) {
+        console.warn('Audio recording not available, will use playback only:', err)
       }
       
-      // Start recording
-      mediaRecorder.start()
+      // Play audio chunks sequentially
+      let currentIndex = 0
       
-      // Play all chunks and wait for completion
-      const playPromises = chunks.map((chunk, i) => {
-        return new Promise<void>((resolve) => {
+      const playNextChunk = (): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          if (currentIndex >= finalChunks.length) {
+            resolve()
+            return
+          }
+          
+          const chunk = finalChunks[currentIndex]
           const utterance = new SpeechSynthesisUtterance(chunk)
-          utterance.voice = selectedVoice
+          utterance.voice = voice
           utterance.rate = speed
+          utterance.lang = voice.lang || 'zh-CN'
           
           utterance.onend = () => {
-            setProgress(50 + ((i + 1) / chunks.length) * 40)
-            resolve()
-          }
-          utterance.onerror = () => {
+            currentIndex++
+            const progressValue = 50 + ((currentIndex) / finalChunks.length) * 50
+            setProgress(Math.min(progressValue, 99))
             resolve()
           }
           
-          // Small delay between chunks
+          utterance.onerror = (event) => {
+            console.error('Speech synthesis error:', event.error)
+            currentIndex++
+            resolve() // Continue even if one chunk fails
+          }
+          
+          // Small delay before speaking
           setTimeout(() => {
             synth.speak(utterance)
           }, 100)
         })
-      })
+      }
       
-      await Promise.all(playPromises)
+      // Play all chunks
+      for (let i = 0; i < finalChunks.length; i++) {
+        await playNextChunk()
+        
+        // Small pause between chunks
+        await new Promise(resolve => setTimeout(resolve, 200))
+      }
       
-      // Wait a bit for MediaRecorder to finalize
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Stop recording and create audio blob
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        await new Promise<void>((resolve) => {
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+            setAudioBlob(audioBlob)
+            
+            // Create download URL
+            const url = URL.createObjectURL(audioBlob)
+            setDownloadUrl(url)
+            
+            // Clean up audio context
+            if (audioContext) {
+              audioContext.close()
+            }
+            
+            resolve()
+          }
+          mediaRecorder.stop()
+        })
+      } else {
+        // No recording available, just set preview
+        setDownloadUrl('preview')
+      }
       
-      // Stop recording
-      mediaRecorder.stop()
-      audioContext.close()
+      setProgress(100)
+      setProcessing(false)
       
     } catch (err: any) {
       console.error('Conversion error:', err)
@@ -258,26 +321,82 @@ export default function EbookToSpeech() {
     }
   }
 
-  const handleDownload = () => {
-    if (!downloadUrl || downloadUrl === 'preview') return
+  const handleDownloadAudio = () => {
+    if (audioBlob) {
+      const url = URL.createObjectURL(audioBlob)
+      const link = document.createElement('a')
+      link.href = url
+      const fileName = file?.name.replace(/\.[^/.]+$/, '') || 'ebook'
+      link.download = `${fileName}_audio.mp3`
+      link.click()
+      URL.revokeObjectURL(url)
+    } else if (downloadUrl && downloadUrl !== 'preview') {
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      const fileName = file?.name.replace(/\.[^/.]+$/, '') || 'ebook'
+      link.download = `${fileName}_audio.mp3`
+      link.click()
+    }
+  }
+
+  const handlePlay = () => {
+    if (!extractedText) return
     
-    // Create download link
-    const link = document.createElement('a')
-    link.href = downloadUrl
-    link.download = `${file?.name.replace(/\.[^/.]+$/, '') || 'audio'}_speech.webm`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const synth = window.speechSynthesis
+    const voices = synth.getVoices()
+    const voice = voices.find(v => v.name === selectedVoice) || 
+                  voices.find(v => v.lang.startsWith('zh')) ||
+                  voices[0]
+    
+    if (voice) {
+      const utterance = new SpeechSynthesisUtterance(extractedText)
+      utterance.voice = voice
+      utterance.rate = speed
+      utterance.lang = voice.lang || 'zh-CN'
+      synth.speak(utterance)
+    }
+  }
+
+  const handleStop = () => {
+    window.speechSynthesis.cancel()
   }
 
   const handleConvertAnother = () => {
-    if (downloadUrl) {
+    handleStop()
+    if (audioBlob) {
       URL.revokeObjectURL(downloadUrl)
+      setAudioBlob(null)
     }
     setDownloadUrl('')
     setProgress(0)
     setExtractedText('')
     clearFile()
+  }
+
+  // Group voices by language
+  const voicesByLanguage = availableVoices.reduce((acc, voice) => {
+    const lang = voice.lang.split('-')[0]
+    if (!acc[lang]) acc[lang] = []
+    acc[lang].push(voice)
+    return acc
+  }, {} as Record<string, SpeechSynthesisVoice[]>)
+
+  const languageNames: Record<string, string> = {
+    'zh': '中文',
+    'en': 'English',
+    'ja': '日本語',
+    'ko': '한국어',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'es': 'Español',
+    'pt': 'Português',
+    'ru': 'Русский',
+    'ar': 'العربية',
+    'it': 'Italiano',
+    'nl': 'Nederlands',
+    'pl': 'Polski',
+    'sv': 'Svenska',
+    'tr': 'Türkçe',
   }
 
   return (
@@ -340,16 +459,29 @@ export default function EbookToSpeech() {
                           {t('ebook_to_speech.voice')}
                         </label>
                         <select
-                          value={voice}
-                          onChange={(e) => setVoice(e.target.value)}
+                          value={selectedVoice}
+                          onChange={(e) => setSelectedVoice(e.target.value)}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-black"
                         >
-                          <option value="alloy">{t('ebook_to_speech.voice_alloy')}</option>
-                          <option value="echo">{t('ebook_to_speech.voice_echo')}</option>
-                          <option value="fable">{t('ebook_to_speech.voice_fable')}</option>
-                          <option value="onyx">{t('ebook_to_speech.voice_onyx')}</option>
-                          <option value="nova">{t('ebook_to_speech.voice_nova')}</option>
-                          <option value="shimmer">{t('ebook_to_speech.voice_shimmer')}</option>
+                          <optgroup label={languageNames['zh'] || '中文'}>
+                            {voicesByLanguage['zh']?.map(v => (
+                              <option key={v.name} value={v.name}>{v.name}</option>
+                            ))}
+                          </optgroup>
+                          <optgroup label={languageNames['en'] || 'English'}>
+                            {voicesByLanguage['en']?.map(v => (
+                              <option key={v.name} value={v.name}>{v.name}</option>
+                            ))}
+                          </optgroup>
+                          {Object.entries(voicesByLanguage)
+                            .filter(([lang]) => !['zh', 'en'].includes(lang))
+                            .map(([lang, voices]) => (
+                              <optgroup key={lang} label={languageNames[lang] || lang}>
+                                {voices.map(v => (
+                                  <option key={v.name} value={v.name}>{v.name}</option>
+                                ))}
+                              </optgroup>
+                            ))}
                         </select>
                       </div>
                       
@@ -443,26 +575,55 @@ export default function EbookToSpeech() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-700">
-                  {t('ebook_to_speech.notice')}
-                </p>
-              </div>
+              {extractedText && (
+                <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                  <h4 className="font-medium text-gray-700 mb-2">
+                    {t('ebook_to_speech.extracted_text')}
+                  </h4>
+                  <p className="text-sm text-gray-600 whitespace-pre-wrap max-h-40 overflow-y-auto">
+                    {extractedText}
+                  </p>
+                </div>
+              )}
 
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-4 flex-wrap">
                 <button
-                  onClick={handleDownload}
+                  onClick={handlePlay}
                   className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  {t('ebook_to_speech.download_audio')}
+                  {t('ebook_to_speech.play')}
                 </button>
                 
                 <button
+                  onClick={handleStop}
+                  className="px-8 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                  </svg>
+                  {t('ebook_to_speech.stop')}
+                </button>
+                
+                {audioBlob && (
+                  <button
+                    onClick={handleDownloadAudio}
+                    className="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {t('ebook_to_speech.download_audio')}
+                  </button>
+                )}
+                
+                <button
                   onClick={handleConvertAnother}
-                  className="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold"
+                  className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
                 >
                   {t('ebook_to_speech.convert_another')}
                 </button>
@@ -546,6 +707,98 @@ export default function EbookToSpeech() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            {t('ebook_to_speech.faq_title')}
+          </h2>
+          <div className="space-y-4">
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <span className="font-medium text-gray-900">
+                  {t('ebook_to_speech.faq_q1') || '支持哪些格式？'}
+                </span>
+                <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="p-4 text-gray-600">
+                {t('ebook_to_speech.faq_a1') || '支持 EPUB、TXT 和 Markdown 格式的电子书文件。'}
+              </div>
+            </details>
+
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <span className="font-medium text-gray-900">
+                  {t('ebook_to_speech.faq_q2') || '转换后的音频可以下载吗？'}
+                </span>
+                <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="p-4 text-gray-600">
+                {t('ebook_to_speech.faq_a2') || '是的，转换成功后点击"下载音频"按钮即可下载音频文件。'}
+              </div>
+            </details>
+
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <span className="font-medium text-gray-900">
+                  {t('ebook_to_speech.faq_q3') || '支持哪些语言？'}
+                </span>
+                <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="p-4 text-gray-600">
+                {t('ebook_to_speech.faq_a3') || '支持中文、英文、日语、韩语、法语、德语、西班牙语等多种语言的语音合成。语音选择会自动根据您的界面语言推荐。'}
+              </div>
+            </details>
+
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <span className="font-medium text-gray-900">
+                  {t('ebook_to_speech.faq_q4') || '可以调整语速吗？'}
+                </span>
+                <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="p-4 text-gray-600">
+                {t('ebook_to_speech.faq_a4') || '是的，您可以通过滑块调整语速，支持 0.5x 到 2x 的速度范围。'}
+              </div>
+            </details>
+
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <span className="font-medium text-gray-900">
+                  {t('ebook_to_speech.faq_q5') || '语音质量如何？'}
+                </span>
+                <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="p-4 text-gray-600">
+                {t('ebook_to_speech.faq_a5') || '我们使用浏览器内置的高质量语音合成引擎，音质清晰自然。不同浏览器的语音质量可能略有差异。'}
+              </div>
+            </details>
+
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <span className="font-medium text-gray-900">
+                  {t('ebook_to_speech.faq_q6') || '我的文件安全吗？'}
+                </span>
+                <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="p-4 text-gray-600">
+                {t('ebook_to_speech.faq_a6') || '是的，所有文件处理都在您的本地浏览器中进行，文件不会上传到服务器，确保您的隐私安全。'}
+              </div>
+            </details>
           </div>
         </div>
       </div>

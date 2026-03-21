@@ -687,3 +687,58 @@ Type error: An object literal cannot have multiple properties with the same name
 
 
   /document-to-ebook，这个页面实现文档转为电子书失败，请检查下代码，然后修改。
+
+
+  /document-to-ebook，txt文件转为电子书失败，请检查下，或者打印日志检查下，请实现。
+
+
+
+  /ebook-to-speech，这个转换成功给用户下载，这个页面再添加常见问题。
+
+
+  /ebook-subtitles，实现该页面电子书转为字幕功能，转为成功给用户下载，请实现。
+
+
+  /ebook-format-conversion，实现该页面电子书格式转换功能，请实现。
+
+
+  /pdf-merge，请实现该页面的pdf合并功能，请实现。
+
+
+  /pdf-split，请实现pdf拆分功能，请实现。
+
+
+  /pdf-deduplicate，实现该页面的pdf相同的内容。
+
+
+
+  /pdf-convert，实现该页面的pdf格式转换功能，可以转为word,txt,excel,ppt,pdf,图片等格式，请实现。
+
+
+  将友情连接中的免费图片处理的链接改为https://mosaic.openai2025.com/，请修改
+
+
+  common.download  这个要实现多语言啊，请实现，还有一个问题是第二次选择上传pdf文件时，第一次选择时，没上传成功，第二次上传成功，请修改
+
+
+  /pdf-to-audio，pdf转为语音功能，成功后可以下载，请实现。
+
+
+  /pdf-to-text，实现pdf转为文字，请实现。
+
+  /pdf-to-subtitles，实现pdf转为字幕功能，请实现。
+
+  /pdf-translate，实现pdf翻译功能，请实现。
+
+
+
+PDF&CSV&电子书 在这个二级菜单“pdf工具”下面再添加一个“文档转为pdf”的二级菜单，也要加上这个页面，请实现。
+
+
+PDF&CSV&电子书 在这个二级菜单“pdf工具”下面再添加一个“pdf添加水印”的二级菜单，也要加上这个页面，要实现多语言，请实现。
+
+
+PDF&CSV&电子书 在这个二级菜单“pdf工具”下面再添加一个“pdf去水印”的二级菜单，也要加上这个页面，要实现多语言，请实现。
+
+
+/pdf-remove-watermark，第一次选择上传pdf文件时，第一次选择时，没上传成功，第二次上传成功，请修改

@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFToSubtitlesTool from '@/components/PDFToSubtitlesTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,10 +17,9 @@ export default function LangPdfToSubtitlesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_to_subtitles" />
+      <PDFToSubtitlesTool toolKey="pdf_to_subtitles" />
       <PDFToolInfo toolKey="pdf_to_subtitles" exampleImages={exampleImages} />
       <CTA />
     </div>
   )
 }
-

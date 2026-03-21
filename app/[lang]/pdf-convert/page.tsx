@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFConvertTool from '@/components/PDFConvertTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangPdfConvertPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_convert" />
+      <PDFConvertTool toolKey="pdf-convert" />
       <PDFToolInfo toolKey="pdf_convert" exampleImages={exampleImages} />
       <CTA />
     </div>

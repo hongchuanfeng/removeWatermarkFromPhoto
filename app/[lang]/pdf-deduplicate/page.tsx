@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFDeduplicateTool from '@/components/PDFDeduplicateTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangPdfDeduplicatePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_deduplicate" />
+      <PDFDeduplicateTool toolKey="pdf-deduplicate" />
       <PDFToolInfo toolKey="pdf_deduplicate" exampleImages={exampleImages} />
       <CTA />
     </div>

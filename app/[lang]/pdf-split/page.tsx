@@ -1,4 +1,4 @@
-import PDFTool from '@/components/PDFTool'
+import PDFSplitTool from '@/components/PDFSplitTool'
 import PDFToolInfo from '@/components/PDFToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangPdfSplitPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <PDFTool toolKey="pdf_split" />
+      <PDFSplitTool toolKey="pdf-split" />
       <PDFToolInfo toolKey="pdf_split" exampleImages={exampleImages} />
       <CTA />
     </div>

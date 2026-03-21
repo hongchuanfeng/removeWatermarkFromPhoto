@@ -1,4 +1,4 @@
-import EbookTool from '@/components/EbookTool'
+import EbookFormatConversionTool from '@/components/EbookFormatConversionTool'
 import EbookToolInfo from '@/components/EbookToolInfo'
 import CTA from '@/components/CTA'
 import { Metadata } from 'next'
@@ -17,7 +17,7 @@ export default function LangEbookFormatConversionPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <EbookTool toolKey="ebook_format_conversion" />
+      <EbookFormatConversionTool toolKey="ebook-format-conversion" />
       <EbookToolInfo toolKey="ebook_format_conversion" exampleImages={exampleImages} />
       <CTA />
     </div>

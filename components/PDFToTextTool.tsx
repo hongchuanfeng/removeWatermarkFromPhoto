@@ -3,19 +3,18 @@
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useState, useRef } from 'react'
 
-interface PDFToolProps {
+interface PDFToTextToolProps {
   toolKey: string
 }
 
-export default function PDFTool({ toolKey }: PDFToolProps) {
+export default function PDFToTextTool({ toolKey }: PDFToTextToolProps) {
   const { t } = useLanguage()
   const [file, setFile] = useState<File | null>(null)
   const [processing, setProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
-  const [audioUrl, setAudioUrl] = useState<string | null>(null)
-  const [audioFileName, setAudioFileName] = useState('')
-  const [pdfText, setPdfText] = useState<string>('')
+  const [extractedText, setExtractedText] = useState<string>('')
+  const [copySuccess, setCopySuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const formatFileSize = (bytes: number) => {
@@ -30,26 +29,22 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
     
     const selectedFile = files[0]
     if (!selectedFile.name.toLowerCase().endsWith('.pdf')) {
-      setError(t('pdf_to_audio.invalid_file') || 'Please select a PDF file')
+      setError(t('pdf_to_text.invalid_file') || 'Please select a PDF file')
       return
     }
     
     setFile(selectedFile)
     setError('')
-    setAudioUrl(null)
+    setExtractedText('')
     setProgress(0)
-    setPdfText('')
   }
 
   const handleClear = () => {
     setFile(null)
-    setAudioUrl(null)
+    setExtractedText('')
     setError('')
     setProgress(0)
-    setPdfText('')
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl)
-    }
+    setCopySuccess(false)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -66,7 +61,7 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
         .map((item: any) => item.str)
         .join(' ')
       fullText += pageText + '\n\n'
-      setProgress(Math.floor((i / numPages) * 30))
+      setProgress(Math.floor((i / numPages) * 80))
     }
     
     return fullText.trim()
@@ -87,7 +82,7 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
     })
   }
 
-  const convertToAudio = async () => {
+  const extractText = async () => {
     if (!file) return
     
     setProcessing(true)
@@ -98,45 +93,53 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
       const pdfjsLib = await loadPdfJs()
       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
       
-      const arrayBuffer = await file.arrayBuffer()
       setProgress(10)
       
-      const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      const arrayBuffer = await file.arrayBuffer()
       setProgress(20)
+      
+      const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      setProgress(30)
       
       const text = await extractTextFromPDF(pdfDoc)
       
       if (!text) {
-        throw new Error(t('pdf_to_audio.no_text') || 'No text found in PDF')
+        throw new Error(t('pdf_to_text.no_text') || 'No text found in PDF')
       }
       
-      setPdfText(text)
-      setProgress(50)
-      
-      // Create Google TTS URL (text limited to ~300 chars per request)
-      const cleanText = text.replace(/\s+/g, ' ').trim()
-      const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanText.slice(0, 200))}&tl=en&client=tw-ob`
-      
-      setAudioUrl(ttsUrl)
-      setAudioFileName(file.name.replace('.pdf', '.mp3'))
+      setExtractedText(text)
       setProgress(100)
       
     } catch (err) {
-      console.error('Conversion error:', err)
-      setError(err instanceof Error ? err.message : (t('pdf_to_audio.error') || 'Conversion failed'))
+      console.error('Extraction error:', err)
+      setError(err instanceof Error ? err.message : (t('pdf_to_text.error') || 'Extraction failed'))
     } finally {
       setProcessing(false)
     }
   }
 
-  const downloadAudio = () => {
-    if (!audioUrl) return
-    
-    // Open in new tab for download
-    const win = window.open(audioUrl, '_blank')
-    if (win) {
-      win.focus()
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(extractedText)
+      setCopySuccess(true)
+      setTimeout(() => setCopySuccess(false), 2000)
+    } catch (err) {
+      console.error('Copy failed:', err)
     }
+  }
+
+  const downloadText = () => {
+    if (!extractedText || !file) return
+    
+    const blob = new Blob([extractedText], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = file.name.replace('.pdf', '.txt')
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -152,7 +155,7 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
-          {!audioUrl ? (
+          {!extractedText ? (
             <>
               <label className="block">
                 <input
@@ -196,11 +199,11 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
                   )}
                   
                   <button
-                    onClick={convertToAudio}
+                    onClick={extractText}
                     disabled={processing}
                     className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400"
                   >
-                    {processing ? t(`${toolKey.replace(/-/g, '_')}.processing`) : t(`${toolKey.replace(/-/g, '_')}.convert`)}
+                    {processing ? t(`${toolKey.replace(/-/g, '_')}.processing`) : t(`${toolKey.replace(/-/g, '_')}.extract`)}
                   </button>
                   
                   <button
@@ -214,28 +217,37 @@ export default function PDFTool({ toolKey }: PDFToolProps) {
               )}
             </>
           ) : (
-            <div className="text-center">
-              <div className="mb-6">
-                <div className="text-6xl mb-4">✅</div>
-                <p className="text-xl text-gray-700 mb-4">
-                  {t('pdf_to_audio.success') || 'Conversion completed!'}
-                </p>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-700">
+                  {t('pdf_to_text.extracted') || 'Extracted Text'}
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyToClipboard}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+                  >
+                    {copySuccess ? (t('pdf_to_text.copied') || 'Copied!') : (t('pdf_to_text.copy') || 'Copy')}
+                  </button>
+                </div>
               </div>
               
-              <audio controls className="w-full mb-6" src={audioUrl} autoPlay>
-                Your browser does not support the audio element.
-              </audio>
+              <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+                  {extractedText}
+                </pre>
+              </div>
               
-              <p className="text-sm text-gray-500 mb-4">
-                {t('pdf_to_audio.listen') || 'Listen to the audio. Right-click the download button and select "Save link as..." to download.'}
-              </p>
+              <div className="text-sm text-gray-500">
+                {t('pdf_to_text.characters') || 'Characters'}: {extractedText.length.toLocaleString()} | {t('pdf_to_text.words') || 'Words'}: {extractedText.split(/\s+/).filter(Boolean).length.toLocaleString()}
+              </div>
               
               <div className="space-y-4">
                 <button
-                  onClick={downloadAudio}
+                  onClick={downloadText}
                   className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition"
                 >
-                  {t('common.download')}
+                  {t('common.download')} (.txt)
                 </button>
                 
                 <button
