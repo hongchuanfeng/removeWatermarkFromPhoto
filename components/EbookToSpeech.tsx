@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useState, useRef, useEffect } from 'react'
 
 export default function EbookToSpeech() {
-  const { t, lang } = useLanguage()
+  const { t, language } = useLanguage()
   const [file, setFile] = useState<File | null>(null)
   const [processing, setProcessing] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState('')
@@ -25,7 +25,7 @@ export default function EbookToSpeech() {
       const voices = window.speechSynthesis.getVoices()
       setAvailableVoices(voices)
       // Set default voice based on language
-      const langPrefix = lang === 'zh' ? 'zh' : lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'
+      const langPrefix = language === 'zh' ? 'zh' : language === 'ja' ? 'ja' : language === 'ko' ? 'ko' : 'en'
       const defaultVoice = voices.find(v => v.lang.startsWith(langPrefix)) || voices[0]
       if (defaultVoice) {
         setSelectedVoice(defaultVoice.name)
@@ -38,7 +38,7 @@ export default function EbookToSpeech() {
     return () => {
       window.speechSynthesis.onvoiceschanged = null
     }
-  }, [lang])
+  }, [language])
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + ' B'
