@@ -45,7 +45,7 @@ export default function PDFSplitTool({ toolKey }: PDFSplitToolProps) {
       
       setFile(selectedFile)
       setError('')
-      setDownloadUrls('')
+      setDownloadUrls([])
       
       try {
         const { PDFDocument } = await import('pdf-lib')
