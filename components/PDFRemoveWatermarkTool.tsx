@@ -83,7 +83,7 @@ export default function PDFRemoveWatermarkTool({ toolKey }: PDFRemoveWatermarkTo
         // Remove watermark annotations from the page
         const annotations = page.node.Annots()
         if (annotations) {
-          const annotsArray = annotations.array
+          const annotsArray: any[] = annotations as any
           if (annotsArray && annotsArray.length > 0) {
             const toRemove: any[] = []
             for (let j = 0; j < annotsArray.length; j++) {
