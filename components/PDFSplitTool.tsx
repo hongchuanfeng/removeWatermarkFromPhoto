@@ -107,8 +107,8 @@ export default function PDFSplitTool({ toolKey }: PDFSplitToolProps) {
         
         setProgress(50)
         
-        const pdfBytes = await newPdf.save()
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+        const pdfBytes.buffer as ArrayBuffer = await newPdf.save()
+        const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
         const url = URL.createObjectURL(blob)
         urls.push({ url, name: `${fileName}_${start}-${end}.pdf` })
         
@@ -130,8 +130,8 @@ export default function PDFSplitTool({ toolKey }: PDFSplitToolProps) {
             newPdf.addPage(page)
           }
           
-          const pdfBytes = await newPdf.save()
-          const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
+          const pdfBytes.buffer as ArrayBuffer = await newPdf.save()
+          const pdfBlob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
           const url = URL.createObjectURL(pdfBlob)
           urls.push({ url, name: `${fileName}_${start}-${end}.pdf` })
         }
@@ -160,8 +160,8 @@ export default function PDFSplitTool({ toolKey }: PDFSplitToolProps) {
         
         setProgress(90)
         
-        const pdfBytes = await newPdf.save()
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+        const pdfBytes.buffer as ArrayBuffer = await newPdf.save()
+        const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
         const url = URL.createObjectURL(blob)
         urls.push({ url, name: `${fileName}_extracted.pdf` })
         

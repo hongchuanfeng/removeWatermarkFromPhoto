@@ -196,7 +196,7 @@ export default function PDFAddWatermarkTool({ toolKey }: PDFAddWatermarkProps) {
       setProgress(80)
 
       const modifiedPdfBytes = await pdfDoc.save()
-      const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' })
+      const blob = new Blob([modifiedPdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
 
       setDownloadUrl(url)
