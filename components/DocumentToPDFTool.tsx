@@ -33,7 +33,7 @@ export default function DocumentToPDF({ toolKey }: DocumentToPDFProps) {
     for (let i = 0; i < inputFiles.length; i++) {
       const file = inputFiles[i]
       const ext = file.name.toLowerCase().split('.').pop()
-      if (['doc', 'docx', 'txt', 'rtf', 'odt', 'html', 'htm'].includes(ext || '')) {
+      if (['doc', 'docx', 'txt', 'rtf', 'odt', 'html', 'htm', 'md', 'markdown', 'ppt', 'pptx'].includes(ext || '')) {
         validFiles.push(file)
       } else {
         invalidFiles.push(file.name)
@@ -96,6 +96,50 @@ export default function DocumentToPDF({ toolKey }: DocumentToPDFProps) {
         
         if (ext === 'txt' || ext === 'rtf') {
           text = await file.text()
+        } else if (ext === 'md' || ext === 'markdown') {
+          // Markdown to plain text
+          const mdText = await file.text()
+          text = mdText
+            .replace(/#{1,6}\s/g, '') // Remove headers
+            .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold
+            .replace(/\*(.+?)\*/g, '$1') // Remove italic
+            .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Remove links
+            .replace(/`(.+?)`/g, '$1') // Remove code
+            .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+            .replace(/^\s*[-*+]\s/gm, '') // Remove list markers
+            .replace(/^\s*\d+\.\s/gm, '') // Remove numbered list markers
+            .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
+        } else if (ext === 'ppt' || ext === 'pptx') {
+          // PPT/PPTX - extract text using pptxgenjs
+          try {
+            const PptxGenJS = await import('pptxgenjs')
+            const arrayBuffer = await file.arrayBuffer()
+            const pptx = new (PptxGenJS.default as any)()
+            await (pptx as any).load(arrayBuffer)
+            
+            const slides = (pptx as any).slides || []
+            const slideTexts: string[] = []
+            
+            for (const slide of slides) {
+              let slideText = ''
+              if (slide.text) {
+                if (Array.isArray(slide.text)) {
+                  slideText = slide.text.map((t: any) => typeof t === 'string' ? t : (t.text || '')).join(' ')
+                } else if (typeof slide.text === 'string') {
+                  slideText = slide.text
+                } else if (typeof slide.text === 'object') {
+                  slideText = slide.text.text || ''
+                }
+              }
+              if (slideText) {
+                slideTexts.push(`[Slide]\n${slideText}`)
+              }
+            }
+            
+            text = slideTexts.join('\n\n')
+          } catch (e) {
+            console.error('Error extracting text from PPT', file.name, e)
+          }
         } else if (ext === 'html' || ext === 'htm') {
           const html = await file.text()
           text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
@@ -299,7 +343,7 @@ export default function DocumentToPDF({ toolKey }: DocumentToPDFProps) {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".doc,.docx,.txt,.rtf,.odt,.html,.htm"
+                  accept=".doc,.docx,.txt,.rtf,.odt,.html,.htm,.md,.markdown,.ppt,.pptx"
                   onChange={handleFileChange}
                   className="hidden"
                   multiple

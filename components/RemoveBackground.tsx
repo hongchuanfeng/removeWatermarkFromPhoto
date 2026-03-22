@@ -1,308 +1,552 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useState, useRef } from 'react'
-
-type RemoveMode = 'auto' | 'color'
+import { useState, useRef, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function RemoveBackground() {
   const { t } = useLanguage()
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [processedImage, setProcessedImage] = useState<string | null>(null)
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [processedUrl, setProcessedUrl] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [removeMode, setRemoveMode] = useState<RemoveMode>('auto')
-  const [tolerance, setTolerance] = useState(30)
-  const [selectedColor, setSelectedColor] = useState('#ffffff')
-  const [fileName, setFileName] = useState('')
+  const [processingProgress, setProcessingProgress] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [backgroundColor, setBackgroundColor] = useState<'transparent' | 'white' | 'custom'>('transparent')
+  const [customColor, setCustomColor] = useState('#ffffff')
+  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<any>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const supabase = createClientComponentClient()
 
-  const getEdgeColor = (imageData: ImageData): { r: number; g: number; b: number } => {
-    const data = imageData.data
-    const width = imageData.width
-    const height = imageData.height
-    
-    // 采样四个角落的颜色
-    const corners = [
-      { x: 0, y: 0 },
-      { x: width - 1, y: 0 },
-      { x: 0, y: height - 1 },
-      { x: width - 1, y: height - 1 }
-    ]
-    
-    let totalR = 0, totalG = 0, totalB = 0
-    
-    corners.forEach(corner => {
-      const idx = (corner.y * width + corner.x) * 4
-      totalR += data[idx]
-      totalG += data[idx + 1]
-      totalB += data[idx + 2]
-    })
-    
-    return {
-      r: Math.round(totalR / 4),
-      g: Math.round(totalG / 4),
-      b: Math.round(totalB / 4)
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
     }
+    getUser()
+  }, [supabase.auth])
+
+  const examples = [
+    { image: '/image/background/1.jpg', title: t('remove_background.example_desc1') },
+    { image: '/image/background/2.jpg', title: t('remove_background.example_desc2') },
+    { image: '/image/background/3.jpg', title: t('remove_background.example_desc3') },
+  ]
+
+  const backgroundOptions = [
+    { value: 'transparent', label: t('remove_background.bg_transparent') || 'Transparent', color: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)' },
+    { value: 'white', label: t('remove_background.bg_white') || 'White', color: '#ffffff' },
+    { value: 'custom', label: t('remove_background.bg_custom') || 'Custom', color: customColor },
+  ]
+
+  const getFormatFromMimeType = (mimeType: string): string => {
+    if (mimeType.includes('png')) return 'PNG'
+    if (mimeType.includes('jpeg') || mimeType.includes('jpg')) return 'JPEG'
+    if (mimeType.includes('webp')) return 'WEBP'
+    return 'Image'
   }
 
-  const colorDistance = (r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number => {
-    return Math.sqrt(
-      Math.pow(r1 - r2, 2) +
-      Math.pow(g1 - g2, 2) +
-      Math.pow(b1 - b2, 2)
-    )
-  }
-
-  const removeBackground = (imageSrc: string, mode: RemoveMode, tol: number, color: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = img.width
-        canvas.height = img.height
-        
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          reject(new Error('Canvas context not available'))
-          return
-        }
-        
-        ctx.drawImage(img, 0, 0)
-        
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        const data = imageData.data
-        
-        // 确定要移除的目标颜色
-        let targetR: number, targetG: number, targetB: number
-        
-        if (mode === 'color') {
-          // 使用用户选择的颜色
-          const hex = color.replace('#', '')
-          targetR = parseInt(hex.substring(0, 2), 16)
-          targetG = parseInt(hex.substring(2, 4), 16)
-          targetB = parseInt(hex.substring(4, 6), 16)
-        } else {
-          // 自动检测边缘颜色
-          const edgeColor = getEdgeColor(imageData)
-          targetR = edgeColor.r
-          targetG = edgeColor.g
-          targetB = edgeColor.b
-        }
-        
-        // 使用 flood fill 算法的简化版本 - 从边缘开始填充
-        const visited = new Set<string>()
-        const width = canvas.width
-        const height = canvas.height
-        
-        // 从四个边缘开始 BFS 搜索背景区域
-        const queue: { x: number; y: number }[] = []
-        
-        // 添加所有边缘点到队列
-        for (let x = 0; x < width; x++) {
-          queue.push({ x, y: 0 })
-          queue.push({ x, y: height - 1 })
-        }
-        for (let y = 0; y < height; y++) {
-          queue.push({ x: 0, y })
-          queue.push({ x: width - 1, y })
-        }
-        
-        const maxDistance = tol * 3 // 将容差转换为颜色距离
-        
-        // BFS 标记背景像素
-        while (queue.length > 0) {
-          const { x, y } = queue.shift()!
-          const key = `${x},${y}`
-          
-          if (visited.has(key)) continue
-          if (x < 0 || x >= width || y < 0 || y >= height) continue
-          
-          const idx = (y * width + x) * 4
-          const r = data[idx]
-          const g = data[idx + 1]
-          const b = data[idx + 2]
-          
-          const dist = colorDistance(r, g, b, targetR, targetG, targetB)
-          
-          if (dist <= maxDistance) {
-            visited.add(key)
-            
-            // 将相邻点加入队列
-            queue.push({ x: x + 1, y })
-            queue.push({ x: x - 1, y })
-            queue.push({ x, y: y + 1 })
-            queue.push({ x, y: y - 1 })
-          }
-        }
-        
-        // 将所有背景像素设为透明
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const key = `${x},${y}`
-            if (visited.has(key)) {
-              const idx = (y * width + x) * 4
-              data[idx + 3] = 0 // 设为透明
-            }
-          }
-        }
-        
-        ctx.putImageData(imageData, 0, 0)
-        resolve(canvas.toDataURL('image/png'))
-      }
-      img.onerror = () => reject(new Error('Failed to load image'))
-      img.src = imageSrc
-    })
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFileName(file.name)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setSelectedImage(result)
-        setProcessedImage(null)
-      }
-      reader.readAsDataURL(file)
+    if (e.target.files && e.target.files[0]) {
+      handleSelectFile(e.target.files[0])
     }
   }
 
-  const handleProcess = async () => {
-    if (!selectedImage) return
-    
+  const handleSelectFile = (selectedFile: File) => {
+    setFile(selectedFile)
+    const url = URL.createObjectURL(selectedFile)
+    setPreviewUrl(url)
+    setProcessedUrl(null)
+    setProcessingProgress(0)
+    setError(null)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleSelectFile(e.dataTransfer.files[0])
+    }
+  }
+
+  const handleClearFile = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+    if (processedUrl) {
+      URL.revokeObjectURL(processedUrl)
+    }
+    setFile(null)
+    setPreviewUrl(null)
+    setProcessedUrl(null)
+    setProcessingProgress(0)
+    setError(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const processImage = async () => {
+    if (!file || !previewUrl) return
+
+    if (!user) {
+      setError(t('remove_background.login_required') || 'Please login first')
+      return
+    }
+
     setIsProcessing(true)
-    
+    setProcessingProgress(0)
+    setError(null)
+
     try {
-      const result = await removeBackground(selectedImage, removeMode, tolerance, selectedColor)
-      setProcessedImage(result)
-    } catch (error) {
-      console.error('Background removal failed:', error)
-    } finally {
+      const progressInterval = setInterval(() => {
+        setProcessingProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return prev
+          }
+          return prev + Math.random() * 15
+        })
+      }, 500)
+
+      const response = await fetch('/api/remove-background', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrl: previewUrl,
+          userId: user.id,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Failed to remove background')
+      }
+      
+      clearInterval(progressInterval)
+      setProcessingProgress(100)
+      setProcessedUrl(data.resultImage)
       setIsProcessing(false)
+
+    } catch (err: any) {
+      console.error('Error processing image:', err)
+      setIsProcessing(false)
+      setError(err.message || t('remove_background.error_message') || 'An error occurred while processing the image.')
     }
   }
 
   const handleDownload = () => {
-    if (!processedImage) return
-    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '')
+    if (!processedUrl || !file) return
+
     const link = document.createElement('a')
-    link.download = `${nameWithoutExt}_no_bg.png`
-    link.href = processedImage
+    link.href = processedUrl
+    const baseName = file.name.replace(/\.[^/.]+$/, '')
+    link.download = baseName + '_no_background.png'
     link.click()
   }
 
+  const handleProcessAnother = () => {
+    handleClearFile()
+  }
+
+  const getResultStyle = () => {
+    if (backgroundColor === 'transparent') {
+      return { background: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundPosition: '0 0, 8px 8px' }
+    } else if (backgroundColor === 'white') {
+      return { background: '#ffffff' }
+    } else {
+      return { background: customColor }
+    }
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('nav.remove_background')}</h1>
-        <p className="text-lg text-gray-600">{t('remove_background.description')}</p>
-      </div>
+    <div className="py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            {t('remove_background.title')}
+          </h1>
+          <p className="text-xl text-gray-600">
+            {t('remove_background.description')}
+          </p>
+        </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        {!selectedImage ? (
-          <div 
-            className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-primary-500 transition"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p className="mt-4 text-lg text-gray-600">{t('remove_background.upload')}</p>
-            <p className="mt-2 text-sm text-gray-500">{t('remove_background.supported')}</p>
-            <input 
-              ref={fileInputRef}
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
-              onChange={handleFileChange}
-            />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="flex justify-center">
-              <img src={selectedImage} alt="Selected" className="max-w-full max-h-96 rounded-lg" />
-            </div>
-
-            {/* 选项 */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-center gap-4 flex-wrap">
-                <label className="text-gray-700">{t('remove_background.mode') || '模式'}:</label>
-                <select 
-                  value={removeMode}
-                  onChange={(e) => { setRemoveMode(e.target.value as RemoveMode); setProcessedImage(null); }}
-                  className="border border-gray-300 rounded-lg px-4 py-2"
-                >
-                  <option value="auto">{t('remove_background.auto') || '自动检测'}</option>
-                  <option value="color">{t('remove_background.color') || '选择颜色'}</option>
-                </select>
+        <div className="bg-white rounded-lg shadow-xl p-8">
+          {!file ? (
+            <div
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition cursor-pointer ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'}`}
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="image-upload"
+              />
+              <div className="cursor-pointer">
+                <div className="text-6xl mb-4">🪄</div>
+                <p className="text-lg text-gray-700 mb-2">
+                  {t('remove_background.upload_title')}
+                </p>
+                <p className="text-sm text-gray-500 mb-2">
+                  {t('remove_background.click_to_upload')}
+                </p>
+                <p className="text-sm text-gray-400">
+                  {t('remove_background.supported_formats')}
+                </p>
               </div>
-              
-              {removeMode === 'color' && (
-                <div className="flex items-center justify-center gap-4">
-                  <label className="text-gray-700">{t('remove_background.select_color') || '选择颜色'}:</label>
-                  <input 
-                    type="color"
-                    value={selectedColor}
-                    onChange={(e) => { setSelectedColor(e.target.value); setProcessedImage(null); }}
-                    className="w-10 h-10 rounded cursor-pointer border border-gray-300"
-                  />
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">🖼️</div>
+                  <div>
+                    <p className="font-medium text-gray-900">{file.name}</p>
+                    <p className="text-sm text-gray-500">
+                      {formatFileSize(file.size)} • {getFormatFromMimeType(file.type)}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleClearFile}
+                  className="p-2 text-gray-400 hover:text-red-500 transition"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    {t('remove_background.original_image') || 'Original Image'}
+                  </p>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-100">
+                    <img
+                      src={previewUrl || ''}
+                      alt="Original"
+                      className="w-full h-auto max-h-80 object-contain rounded"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    {t('remove_background.result') || 'Result'}
+                  </p>
+                  <div 
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-2"
+                    style={getResultStyle()}
+                  >
+                    {processedUrl ? (
+                      <img
+                        src={processedUrl}
+                        alt="Processed"
+                        className="w-full h-auto max-h-80 object-contain rounded"
+                      />
+                    ) : (
+                      <div className="w-full h-80 flex items-center justify-center text-gray-400">
+                        {t('remove_background.waiting_process') || 'Waiting for processing...'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
                 </div>
               )}
-              
-              <div className="flex items-center justify-center gap-4">
-                <label className="text-gray-700">{t('remove_background.tolerance') || '容差'}:</label>
-                <input 
-                  type="range" 
-                  min="1" 
-                  max="100" 
-                  value={tolerance}
-                  onChange={(e) => { setTolerance(Number(e.target.value)); setProcessedImage(null); }}
-                  className="w-48"
+
+              {!processedUrl && !isProcessing && (
+                <div className="mb-6">
+                  <p className="text-sm font-medium text-gray-700 mb-3">
+                    {t('remove_background.select_bg') || 'Select Background Color'}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {backgroundOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setBackgroundColor(option.value as 'transparent' | 'white' | 'custom')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${backgroundColor === option.value ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      >
+                        <span 
+                          className="inline-block w-4 h-4 rounded border border-gray-300 mr-2 align-middle"
+                          style={{ background: option.color }}
+                        />
+                        {option.label}
+                      </button>
+                    ))}
+                    {backgroundColor === 'custom' && (
+                      <input
+                        type="color"
+                        value={customColor}
+                        onChange={(e) => setCustomColor(e.target.value)}
+                        className="w-10 h-10 rounded cursor-pointer"
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {!processedUrl && !isProcessing && (
+                <button
+                  onClick={processImage}
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  {t('remove_background.remove_bg')} (1 {t('remove_background.credits') || 'credit'})
+                </button>
+              )}
+
+              {isProcessing && (
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-lg text-gray-700">
+                      {t('remove_background.processing')} {Math.round(processingProgress)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${processingProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
+              {processedUrl && (
+                <div className="flex flex-wrap justify-center gap-4">
+                  <button
+                    onClick={handleDownload}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {t('remove_background.download') || t('common.download')}
+                  </button>
+                  <button
+                    onClick={handleProcessAnother}
+                    className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  >
+                    {t('remove_background.process_another') || t('common.another')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {t('remove_background.features_title') || 'Key Features'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">🤖</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {t('remove_background.feature1') || 'AI-Powered'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {t('remove_background.feature1_desc') || 'Smart AI automatically detects and removes backgrounds'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">⚡</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {t('remove_background.feature2') || 'Fast Processing'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {t('remove_background.feature2_desc') || 'Get results in seconds, not minutes'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">🎨</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {t('remove_background.feature3') || 'Custom Backgrounds'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {t('remove_background.feature3_desc') || 'Replace background with any color or transparency'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">📱</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {t('remove_background.feature4') || 'HD Quality'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {t('remove_background.feature4_desc') || 'Maintain original image quality'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {t('remove_background.how_to_use_title') || 'How to Use'}
+          </h2>
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">1</div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  {t('remove_background.how_to_use_step1') || 'Upload Image'}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {t('remove_background.how_to_use_step1_desc') || 'Select an image file to remove background'}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">2</div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  {t('remove_background.how_to_use_step2') || 'Select Background'}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {t('remove_background.how_to_use_step2_desc') || 'Choose transparent, white, or custom background'}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">3</div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  {t('remove_background.how_to_use_step3') || 'Process'}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {t('remove_background.how_to_use_step3_desc') || 'Click "Remove Background" to process'}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">4</div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  {t('remove_background.how_to_use_step4') || 'Download Result'}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {t('remove_background.how_to_use_step4_desc') || 'Download your image without background'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {t('remove_background.faq_title') || 'FAQ'}
+          </h2>
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {t('remove_background.faq_q1')}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                {t('remove_background.faq_a1')}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {t('remove_background.faq_q2')}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                {t('remove_background.faq_a2')}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {t('remove_background.faq_q3')}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                {t('remove_background.faq_a3')}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {t('remove_background.faq_q4')}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                {t('remove_background.faq_a4')}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {t('remove_background.faq_q5')}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                {t('remove_background.faq_a5')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            {t('remove_background.examples_title')}
+          </h2>
+          <p className="text-center text-gray-600 mb-12">
+            {t('remove_background.examples_desc')}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {examples.map((example, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <img
+                  src={example.image}
+                  alt={example.title}
+                  className="w-full h-48 object-cover"
                 />
-                <span className="text-gray-600">{tolerance}</span>
+                <div className="p-4 bg-gray-50">
+                  <p className="text-sm text-gray-600 font-medium">{example.title}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => { setSelectedImage(null); setProcessedImage(null); }}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-              >
-                {t('common.clear')}
-              </button>
-              <button
-                onClick={handleProcess}
-                disabled={isProcessing}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
-              >
-                {isProcessing ? t('remove_background.processing') : t('remove_background.remove')}
-              </button>
-            </div>
+            ))}
           </div>
-        )}
-
-        {processedImage && (
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">{t('remove_background.result')}</h3>
-            <div className="flex justify-center mb-6">
-              <div className="relative">
-                <img src={processedImage} alt="Processed" className="max-w-full max-h-96 rounded-lg" />
-                <div className="absolute inset-0 bg-gray-200 -z-10 rounded-lg" />
-              </div>
-            </div>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleDownload}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
-              >
-                {t('remove_background.download')}
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   )
 }
-

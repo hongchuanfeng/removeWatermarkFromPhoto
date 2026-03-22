@@ -69,7 +69,7 @@ export default function AIFaceBeautify() {
           disabled={!selectedFile || loading}
           className="w-full bg-rose-600 text-white py-3 rounded-lg font-semibold hover:bg-rose-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          {loading ? t('ai_face_beautify.processing') : t('ai_face_beautify.process')}
+          {loading ? t('ai_face_beautify.processing') : `${t('ai_face_beautify.process')} (1 ${t('ai_face_beautify.credits') || '积分'})`}
         </button>
 
         {result && (

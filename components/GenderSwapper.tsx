@@ -76,7 +76,7 @@ export default function GenderSwapper() {
           disabled={!selectedFile || loading}
           className="w-full bg-pink-600 text-white py-3 rounded-lg font-semibold hover:bg-pink-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          {loading ? t('gender_swapper.processing') : t('gender_swapper.process')}
+          {loading ? t('gender_swapper.processing') : `${t('gender_swapper.process')} (1 ${t('gender_swapper.credits') || '积分'})`}
         </button>
 
         {result && (

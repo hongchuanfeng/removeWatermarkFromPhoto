@@ -742,3 +742,100 @@ PDF&CSV&电子书 在这个二级菜单“pdf工具”下面再添加一个“pd
 
 
 /pdf-remove-watermark，第一次选择上传pdf文件时，第一次选择时，没上传成功，第二次上传成功，请修改
+
+
+
+在图片工具下面的二级菜单的“图片处理”最后加上一个图床功能，
+把图片上传到腾讯云上，配置在.env.local文件中，请实现。
+
+
+
+/video-watermark-removal，实现该功能，视频去水印功能，成功后可以下载，请实现。
+
+
+/video-to-text，实现该功能，视频转文字功能，成功后可以下载，请实现。
+
+
+/video-to-speech，实现该功能，视频转语音功能，成功后可以下载，请实现。
+
+
+/old-video-restoration，实现该功能，旧片修复功能，成功后可以下载，请实现。
+
+
+/audio-clip-merge，实现该功能，音频剪辑合并功能，成功后可以下载，请实现。
+
+/audio-format-conversion，实现该功能，音频格式转换功能，成功后可以下载，请实现。
+
+
+/video-to-text，这个页面功能，没明白我的意思，我意思是当使用转为文字时，只转了前面3秒中，后面都没转了，请修改这个bug。
+
+
+
+
+/video-to-speech，实现该页面，视频转为音频的功能，要实现多语言，请实现。
+
+
+/old-video-restoration，实现该页面旧电影修复功能，要实现多语言，请实现。
+
+
+
+
+
+/video-to-speech 这个页面的下面的实现多语言：
+
+How It Works
+
+Upload Video
+Upload any video file with speech
+
+
+AI Recognition
+Automatically recognize speech from video
+
+
+Multi-language TTS
+Convert to speech in any language
+
+
+20+ Languages
+Support for English, Chinese, Japanese, Korean, and more
+
+Real-time Processing
+Quick speech recognition and synthesis
+
+
+Adjustable Speed
+Control playback speed from 0.5x to 2x
+
+
+Natural Voices
+High-quality text-to-speech output
+
+
+
+在“图片工具” 下面的 在这个二级菜单“AI图像”下面再添加一个“AI抠图”的二级菜单，也要加上这个页面，实现多语言，请实现。
+
+
+
+在“图片工具” 下面的 在这个二级菜单“AI图像”下面再添加一个“AI文生图”的二级菜单，1积分一次，成功后可以下载，也要加上这个页面，实现多语言，请实现。
+
+
+在“图片工具” 下面的 在这个二级菜单“AI图像”下面再添加一个“AI文生视频”的二级菜单，2积分一次，成功后可以下载，也要加上这个页面，实现多语言，请实现。
+
+
+在“图片工具” 下面的 在这个二级菜单“AI图像”下面再添加一个“AI绘画”的二级菜单，2积分一次，成功后可以下载，也要加上这个页面，实现多语言，请实现。
+
+
+在“图片工具” 下面的 在这个二级菜单“AI图像”下面再添加一个“AI漫剧”的二级菜单，2积分一次，成功后可以下载，也要加上这个页面，实现多语言，请实现。
+
+
+
+将“AI图像”下面的二级菜单“性别转换”改为“AI性别转换”，然后把该页面中的“处理图片”按钮改为“处理图片(1积分)”，请修改
+
+
+
+/ai-face-beautify，该页面中的“处理图片”按钮改为“处理图片(1积分)”，请修改
+
+
+
+/pdf-convert，pdf转换页面，再加上excel,ppt ，markdown和html，请修改

@@ -122,7 +122,7 @@ export default function AIAgeChange() {
           disabled={!selectedFile || loading}
           className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          {loading ? t('ai_age_change.processing') : t('ai_age_change.process')}
+          {loading ? t('ai_age_change.processing') : `${t('ai_age_change.process')} (1 ${t('ai_age_change.credits') || '积分'})`}
         </button>
 
         {result && (

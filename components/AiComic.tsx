@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function TextToImage() {
+export default function AiComic() {
   const { t } = useLanguage()
   const [prompt, setPrompt] = useState('')
   const [generatedImage, setGeneratedImage] = useState<string | null>(null)
@@ -12,13 +12,8 @@ export default function TextToImage() {
   const [processingProgress, setProcessingProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
+  const [comicStyle, setComicStyle] = useState('manga')
   const supabase = createClientComponentClient()
-
-  const examplePrompts = [
-    t('text_to_image.example1') || 'A beautiful sunset over the ocean',
-    t('text_to_image.example2') || 'A futuristic city with flying cars',
-    t('text_to_image.example3') || 'A cute cat wearing sunglasses',
-  ]
 
   useEffect(() => {
     const getUser = async () => {
@@ -28,11 +23,25 @@ export default function TextToImage() {
     getUser()
   }, [supabase.auth])
 
+  const comicStyles = [
+    { id: 'manga', name: 'Manga', emoji: '📖' },
+    { id: 'marvel', name: 'Marvel', emoji: '🦸' },
+    { id: 'disney', name: 'Disney', emoji: '🏰' },
+    { id: 'anime', name: 'Anime', emoji: '🌸' },
+    { id: 'comic', name: 'Comic', emoji: '💥' },
+  ]
+
+  const examplePrompts = [
+    t('ai_comic.example1') || 'A hero standing on a mountain top',
+    t('ai_comic.example2') || 'Two friends having an adventure',
+    t('ai_comic.example3') || 'A magical forest with fairy',
+  ]
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return
 
     if (!user) {
-      setError(t('text_to_image.login_required') || 'Please login first')
+      setError(t('ai_comic.login_required') || 'Please login first')
       return
     }
 
@@ -52,13 +61,14 @@ export default function TextToImage() {
         })
       }, 500)
 
-      const response = await fetch('/api/text-to-image', {
+      const response = await fetch('/api/ai-comic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           prompt: prompt,
+          style: comicStyle,
           userId: user.id,
         }),
       })
@@ -66,18 +76,18 @@ export default function TextToImage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || data.details || 'Failed to generate image')
+        throw new Error(data.error || data.details || 'Failed to generate comic')
       }
-      
+
       clearInterval(progressInterval)
       setProcessingProgress(100)
       setGeneratedImage(data.resultImage)
       setIsGenerating(false)
 
     } catch (err: any) {
-      console.error('Error generating image:', err)
+      console.error('Error generating comic:', err)
       setIsGenerating(false)
-      setError(err.message || t('text_to_image.error_message') || 'An error occurred while generating the image.')
+      setError(err.message || t('ai_comic.error_message') || 'An error occurred while generating the comic.')
     }
   }
 
@@ -86,7 +96,7 @@ export default function TextToImage() {
 
     const link = document.createElement('a')
     link.href = generatedImage
-    link.download = `ai-generated-${Date.now()}.png`
+    link.download = `ai-comic-${Date.now()}.png`
     link.click()
   }
 
@@ -101,41 +111,63 @@ export default function TextToImage() {
     setPrompt(example)
   }
 
-  const characterCount = prompt.length
-  const maxCharacters = 500
-
   return (
     <div className="py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {t('text_to_image.title')}
+            {t('ai_comic.title')}
           </h1>
           <p className="text-xl text-gray-600">
-            {t('text_to_image.description')}
+            {t('ai_comic.description')}
           </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
           {!generatedImage ? (
             <>
+              {/* Style Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  {t('ai_comic.style_label')}
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {comicStyles.map((style) => (
+                    <button
+                      key={style.id}
+                      onClick={() => setComicStyle(style.id)}
+                      className={`px-4 py-2 rounded-lg flex items-center gap-2 transition ${
+                        comicStyle === style.id
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                      disabled={isGenerating}
+                    >
+                      <span>{style.emoji}</span>
+                      <span>{t(`ai_comic.style_${style.id}`) || style.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Prompt Input */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('text_to_image.prompt_label')}
+                  {t('ai_comic.prompt_label')}
                 </label>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={t('text_to_image.prompt_placeholder') || 'Describe the image you want to generate...'}
-                  className="w-full h-40 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none placeholder:text-gray-900 text-gray-900"
-                  maxLength={maxCharacters}
+                  placeholder={t('ai_comic.prompt_placeholder') || 'Describe your comic scene...'}
+                  className="w-full h-40 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none text-gray-900"
+                  maxLength={500}
                 />
                 <div className="flex justify-between mt-2">
                   <span className="text-xs text-gray-500">
-                    {t('text_to_image.prompt_tip')}
+                    {t('ai_comic.prompt_tip')}
                   </span>
-                  <span className={`text-xs ${characterCount > maxCharacters * 0.9 ? 'text-orange-500' : 'text-gray-500'}`}>
-                    {characterCount}/{maxCharacters}
+                  <span className={`text-xs ${prompt.length > 450 ? 'text-orange-500' : 'text-gray-500'}`}>
+                    {prompt.length}/500
                   </span>
                 </div>
               </div>
@@ -146,9 +178,10 @@ export default function TextToImage() {
                 </div>
               )}
 
+              {/* Example Prompts */}
               <div className="mb-6">
                 <p className="text-sm font-medium text-gray-700 mb-3">
-                  {t('text_to_image.examples_title')}
+                  {t('ai_comic.examples_title')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {examplePrompts.map((example, index) => (
@@ -164,6 +197,7 @@ export default function TextToImage() {
                 </div>
               </div>
 
+              {/* Generate Button */}
               <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || isGenerating}
@@ -179,14 +213,14 @@ export default function TextToImage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {t('text_to_image.generating')} {Math.round(processingProgress)}%
+                    {t('ai_comic.generating')} {Math.round(processingProgress)}%
                   </>
                 ) : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    {t('text_to_image.generate')}
+                    {t('ai_comic.generate')} (2 {t('ai_comic.credits')})
                   </>
                 )}
               </button>
@@ -207,10 +241,10 @@ export default function TextToImage() {
                   <span className="text-xl">💡</span>
                   <div>
                     <p className="text-sm font-medium text-purple-900">
-                      {t('text_to_image.tip_title')}
+                      {t('ai_comic.tip_title')}
                     </p>
                     <p className="text-sm text-purple-700 mt-1">
-                      {t('text_to_image.tip_content')}
+                      {t('ai_comic.tip_content')}
                     </p>
                   </div>
                 </div>
@@ -220,7 +254,7 @@ export default function TextToImage() {
             <div>
               <div className="mb-6">
                 <p className="text-sm font-medium text-gray-700 mb-2">
-                  {t('text_to_image.your_prompt')}
+                  {t('ai_comic.your_prompt')}
                 </p>
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
                   {prompt}
@@ -229,12 +263,12 @@ export default function TextToImage() {
 
               <div className="mb-6">
                 <p className="text-sm font-medium text-gray-700 mb-2">
-                  {t('text_to_image.generated_image')}
+                  {t('ai_comic.generated_comic')}
                 </p>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-100">
                   <img
                     src={generatedImage}
-                    alt="Generated"
+                    alt="Generated Comic"
                     className="w-full h-auto rounded"
                   />
                 </div>
@@ -248,106 +282,93 @@ export default function TextToImage() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  {t('text_to_image.download')}
+                  {t('ai_comic.download')}
                 </button>
                 <button
                   onClick={handleGenerateAnother}
                   className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
                 >
-                  {t('text_to_image.generate_another')}
+                  {t('ai_comic.generate_another')}
                 </button>
               </div>
             </div>
           )}
         </div>
 
+        {/* Features */}
         <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('text_to_image.features_title')}
+            {t('ai_comic.features_title')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="text-2xl">🤖</span>
+              <span className="text-2xl">📚</span>
               <div>
-                <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature1')}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature1_desc')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="text-2xl">⚡</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature2')}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature2_desc')}
-                </p>
+                <h3 className="font-semibold text-gray-900">{t('ai_comic.feature1')}</h3>
+                <p className="text-sm text-gray-600">{t('ai_comic.feature1_desc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <span className="text-2xl">🎨</span>
               <div>
-                <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature3')}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature3_desc')}
-                </p>
+                <h3 className="font-semibold text-gray-900">{t('ai_comic.feature2')}</h3>
+                <p className="text-sm text-gray-600">{t('ai_comic.feature2_desc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="text-2xl">📱</span>
+              <span className="text-2xl">⚡</span>
               <div>
-                <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature4')}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature4_desc')}
-                </p>
+                <h3 className="font-semibold text-gray-900">{t('ai_comic.feature3')}</h3>
+                <p className="text-sm text-gray-600">{t('ai_comic.feature3_desc')}</p>
               </div>
             </div>
           </div>
         </div>
 
+        {/* FAQ */}
         <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('text_to_image.faq_title')}
+            {t('ai_comic.faq_title')}
           </h2>
           <div className="space-y-6">
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q1')}
+                {t('ai_comic.faq_q1')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a1')}
+                {t('ai_comic.faq_a1')}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q2')}
+                {t('ai_comic.faq_q2')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a2')}
+                {t('ai_comic.faq_a2')}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q3')}
+                {t('ai_comic.faq_q3')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a3')}
+                {t('ai_comic.faq_a3')}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q4')}
+                {t('ai_comic.faq_q4')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a4')}
+                {t('ai_comic.faq_a4')}
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {t('ai_comic.faq_q5')}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                {t('ai_comic.faq_a5')}
               </p>
             </div>
           </div>

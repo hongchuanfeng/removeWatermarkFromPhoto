@@ -152,24 +152,59 @@ export default function Navbar() {
                         </div>
                         <Link 
                           href={getLangPath('/ai-age-change', language)} 
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                         >
-                          {t('nav.ai_age_change')}
+                          <span>{t('nav.ai_age_change')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                         </Link>
                         <Link 
                           href={getLangPath('/gender-swapper', language)} 
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                         >
-                          {t('nav.gender_swapper')}
+                          <span>{t('nav.gender_swapper')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                         </Link>
                         <Link 
                           href={getLangPath('/ai-face-beautify', language)} 
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                         >
-                          {t('nav.ai_face_beautify')}
+                          <span>{t('nav.ai_face_beautify')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                        </Link>
+                        <Link 
+                          href={getLangPath('/remove-background', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          <span>{t('nav.ai_remove_background')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                        </Link>
+                        <Link 
+                          href={getLangPath('/text-to-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          <span>{t('nav.ai_text_to_image')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ai-drawing', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          <span>{t('nav.ai_drawing')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ai-comic', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          <span>{t('nav.ai_comic')}</span>
+                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                         </Link>
                       </div>
 
@@ -310,6 +345,13 @@ export default function Navbar() {
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                         >
                           {t('nav.view_exif')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/image-hosting', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.image_hosting')}
                         </Link>
                       </div>
                     </div>
@@ -862,14 +904,33 @@ export default function Navbar() {
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider py-1">
                     {t('nav.ai_image_tools')}
                   </div>
-                  <Link href={getLangPath('/ai-age-change', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-                    {t('nav.ai_age_change')}
+                  <Link href={getLangPath('/ai-age-change', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_age_change')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                   </Link>
-                  <Link href={getLangPath('/gender-swapper', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-                    {t('nav.gender_swapper')}
+                  <Link href={getLangPath('/gender-swapper', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.gender_swapper')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                   </Link>
-                  <Link href={getLangPath('/ai-face-beautify', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-                    {t('nav.ai_face_beautify')}
+                  <Link href={getLangPath('/ai-face-beautify', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_face_beautify')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                  </Link>
+                  <Link href={getLangPath('/remove-background', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_remove_background')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                  </Link>
+                  <Link href={getLangPath('/text-to-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_text_to_image')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                  </Link>
+                  <Link href={getLangPath('/ai-drawing', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_drawing')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                  </Link>
+                  <Link href={getLangPath('/ai-comic', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_comic')}</span>
+                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                   </Link>
 
                   {/* Image Processing Tools */}
@@ -935,6 +996,9 @@ export default function Navbar() {
                   </Link>
                   <Link href={getLangPath('/view-exif', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.view_exif')}
+                  </Link>
+                  <Link href={getLangPath('/image-hosting', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_hosting')}
                   </Link>
                 </div>
               )}

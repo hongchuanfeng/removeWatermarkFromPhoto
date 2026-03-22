@@ -7,7 +7,7 @@ interface PDFConvertToolProps {
   toolKey: string
 }
 
-type OutputFormat = 'png' | 'jpg' | 'txt' | 'docx'
+type OutputFormat = 'png' | 'jpg' | 'txt' | 'docx' | 'xlsx' | 'pptx' | 'html' | 'markdown'
 
 interface ConvertedFile {
   name: string
@@ -210,6 +210,164 @@ export default function PDFConvertTool({ toolKey }: PDFConvertToolProps) {
     }]
   }
 
+  const convertToXlsx = async (pdfDoc: PDFDocument, baseName: string) => {
+    let fullText = ''
+    
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      setProgress(Math.floor((i / pdfDoc.numPages) * 70))
+      const page = await pdfDoc.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .map((item) => item.str)
+        .join(' ')
+      fullText += `Page ${i}:\n${pageText}\n\n`
+    }
+    
+    setProgress(85)
+    
+    const ExcelJS = await import('exceljs')
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('PDF Content')
+    
+    const lines = fullText.split('\n').filter(line => line.trim())
+    const dataRows: string[][] = []
+    
+    lines.forEach((line) => {
+      if (line.startsWith('Page ')) {
+        dataRows.push([line])
+      } else {
+        const words = line.split(/\s+/)
+        if (words.length > 0) {
+          dataRows.push(words)
+        }
+      }
+    })
+    
+    dataRows.forEach((row) => {
+      worksheet.addRow(row)
+    })
+    
+    const blob = await workbook.xlsx.writeBuffer()
+    const uint8Array = new Uint8Array(blob as unknown as ArrayBuffer)
+    const blobResult = new Blob([uint8Array], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = URL.createObjectURL(blobResult)
+    
+    return [{
+      name: `${baseName}.xlsx`,
+      url,
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    }]
+  }
+
+  const convertToPptx = async (pdfDoc: PDFDocument, baseName: string) => {
+    let fullText = ''
+    
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      setProgress(Math.floor((i / pdfDoc.numPages) * 70))
+      const page = await pdfDoc.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .map((item) => item.str)
+        .join(' ')
+      fullText += `${pageText}\n`
+    }
+    
+    setProgress(85)
+    
+    const PptxGenJS = await import('pptxgenjs')
+    const pptx = new (PptxGenJS.default as any)()
+    
+    const textBlocks = fullText.split('\n').filter(block => block.trim())
+    const blocksPerSlide = 6
+    
+    for (let i = 0; i < textBlocks.length; i += blocksPerSlide) {
+      const slide = pptx.addSlide()
+      const blockGroup = textBlocks.slice(i, i + blocksPerSlide)
+      
+      blockGroup.forEach((text: string, index: number) => {
+        slide.addShape('rect', {
+          x: 0.5,
+          y: 0.5 + index * 1.2,
+          w: 9,
+          h: 1,
+          fill: { color: 'F5F5F5' },
+          line: { color: 'CCCCCC', width: 0.5 }
+        })
+        
+        slide.addText(text.substring(0, 100), {
+          x: 0.6,
+          y: 0.6 + index * 1.2,
+          w: 8.8,
+          h: 0.8,
+          fontSize: 14,
+          color: '333333'
+        })
+      })
+    }
+    
+    const blob = await (pptx as any).write('blob')
+    const url = URL.createObjectURL(blob)
+    
+    return [{
+      name: `${baseName}.pptx`,
+      url,
+      type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    }]
+  }
+
+  const convertToHtml = async (pdfDoc: PDFDocument, baseName: string) => {
+    let htmlContent = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>PDF Content</title>\n<style>\nbody { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }\nh1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }\n.page { margin-bottom: 40px; background: #f9f9f9; padding: 20px; border-radius: 8px; }\n.page-title { color: #007bff; font-size: 1.5em; margin-bottom: 15px; }\np { line-height: 1.6; color: #444; }\n</style>\n</head>\n<body>\n<h1>PDF Content</h1>\n'
+    
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      setProgress(Math.floor((i / pdfDoc.numPages) * 80))
+      const page = await pdfDoc.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .map((item) => {
+          const text = item.str
+          return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        })
+        .join(' ')
+      
+      htmlContent += `<div class="page">\n<div class="page-title">Page ${i}</div>\n<p>${pageText}</p>\n</div>\n`
+    }
+    
+    htmlContent += '</body>\n</html>'
+    
+    const blob = new Blob([htmlContent], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    
+    return [{
+      name: `${baseName}.html`,
+      url,
+      type: 'text/html'
+    }]
+  }
+
+  const convertToMarkdown = async (pdfDoc: PDFDocument, baseName: string) => {
+    let markdownContent = '# PDF Content\n\n'
+    
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      setProgress(Math.floor((i / pdfDoc.numPages) * 80))
+      const page = await pdfDoc.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items
+        .map((item) => item.str)
+        .join(' ')
+      
+      markdownContent += `## Page ${i}\n\n${pageText}\n\n---\n\n`
+    }
+    
+    const blob = new Blob([markdownContent], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    
+    return [{
+      name: `${baseName}.md`,
+      url,
+      type: 'text/markdown'
+    }]
+  }
+
   const handleConvert = async () => {
     if (!file) return
     
@@ -241,6 +399,18 @@ export default function PDFConvertTool({ toolKey }: PDFConvertToolProps) {
           break
         case 'docx':
           results = await convertToDocx(pdfDoc, baseName)
+          break
+        case 'xlsx':
+          results = await convertToXlsx(pdfDoc, baseName)
+          break
+        case 'pptx':
+          results = await convertToPptx(pdfDoc, baseName)
+          break
+        case 'html':
+          results = await convertToHtml(pdfDoc, baseName)
+          break
+        case 'markdown':
+          results = await convertToMarkdown(pdfDoc, baseName)
           break
         default:
           throw new Error('Unsupported format')
@@ -282,6 +452,10 @@ export default function PDFConvertTool({ toolKey }: PDFConvertToolProps) {
     { value: 'jpg', label: t('pdf_convert.format_jpg') || 'JPG Images', icon: '📷', desc: t('pdf_convert.format_jpg_desc') },
     { value: 'txt', label: t('pdf_convert.format_txt') || 'Text File', icon: '📝', desc: t('pdf_convert.format_txt_desc') },
     { value: 'docx', label: t('pdf_convert.format_docx') || 'Word Document', icon: '📄', desc: t('pdf_convert.format_docx_desc') },
+    { value: 'xlsx', label: t('pdf_convert.format_xlsx') || 'Excel Spreadsheet', icon: '📊', desc: t('pdf_convert.format_xlsx_desc') },
+    { value: 'pptx', label: t('pdf_convert.format_pptx') || 'PowerPoint', icon: '📽️', desc: t('pdf_convert.format_pptx_desc') },
+    { value: 'html', label: t('pdf_convert.format_html') || 'HTML File', icon: '🌐', desc: t('pdf_convert.format_html_desc') },
+    { value: 'markdown', label: t('pdf_convert.format_markdown') || 'Markdown', icon: '📋', desc: t('pdf_convert.format_markdown_desc') },
   ]
 
   return (
@@ -329,7 +503,7 @@ export default function PDFConvertTool({ toolKey }: PDFConvertToolProps) {
                     <h3 className="font-semibold text-gray-700 mb-4">
                       {t('pdf_convert.select_format') || 'Select Output Format'}
                     </h3>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {formatOptions.map((format) => (
                         <button
                           key={format.value}
