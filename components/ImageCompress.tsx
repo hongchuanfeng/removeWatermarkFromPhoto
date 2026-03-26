@@ -13,28 +13,29 @@ export default function ImageCompress() {
   const [quality, setQuality] = useState(80)
   const [fileName, setFileName] = useState<string>('')
   const [fileType, setFileType] = useState<string>('image/jpeg')
+  const [outputFormat, setOutputFormat] = useState<string>('image/jpeg')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const compressImage = (imageSrc: string, qualityValue: number): Promise<string> => {
+  const compressImage = (imageSrc: string, qualityValue: number, format: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image()
       img.onload = () => {
         const canvas = document.createElement('canvas')
         canvas.width = img.width
         canvas.height = img.height
-        
+
         const ctx = canvas.getContext('2d')
         if (!ctx) {
           reject(new Error('Canvas context not available'))
           return
         }
-        
+
         ctx.drawImage(img, 0, 0)
-        
-        // 根据原始文件类型决定输出格式
-        const outputType = fileType === 'image/png' ? 'image/png' : 'image/jpeg'
+
+        // 使用用户选择的输出格式
+        const outputType = format
         const outputQuality = outputType === 'image/png' ? 1 : qualityValue / 100
-        
+
         const compressedDataUrl = canvas.toDataURL(outputType, outputQuality)
         resolve(compressedDataUrl)
       }
@@ -63,13 +64,13 @@ export default function ImageCompress() {
 
   const handleProcess = async () => {
     if (!selectedImage) return
-    
+
     setIsProcessing(true)
-    
+
     try {
-      const compressed = await compressImage(selectedImage, quality)
+      const compressed = await compressImage(selectedImage, quality, outputFormat)
       setProcessedImage(compressed)
-      
+
       // 计算压缩后的大小
       const base64Data = compressed.split(',')[1]
       const compressedSizeBytes = Math.round((base64Data.length * 3) / 4)
@@ -83,23 +84,19 @@ export default function ImageCompress() {
 
   const handleDownload = () => {
     if (!processedImage) return
-    
-    // 根据原始文件类型确定扩展名
+
+    // 根据用户选择的输出格式确定扩展名
     let extension = 'jpg'
-    if (fileType === 'image/png') {
+    if (outputFormat === 'image/png') {
       extension = 'png'
-    } else if (fileType === 'image/gif') {
-      extension = 'gif'
-    } else if (fileType === 'image/webp') {
+    } else if (outputFormat === 'image/webp') {
       extension = 'webp'
-    } else if (fileType === 'image/bmp') {
-      extension = 'bmp'
     }
-    
+
     // 移除原始文件扩展名，添加压缩后的扩展名
     const originalNameWithoutExt = fileName.replace(/\.[^/.]+$/, '')
     const downloadName = `${originalNameWithoutExt}_compressed.${extension}`
-    
+
     const link = document.createElement('a')
     link.download = downloadName
     link.href = processedImage
@@ -154,15 +151,28 @@ export default function ImageCompress() {
             
             <div className="flex items-center justify-center gap-4">
               <label className="text-gray-700">{t('image_compress.quality')}:</label>
-              <input 
-                type="range" 
-                min="10" 
-                max="100" 
+              <input
+                type="range"
+                min="10"
+                max="100"
                 value={quality}
                 onChange={(e) => setQuality(Number(e.target.value))}
                 className="w-48"
               />
               <span className="text-gray-600">{quality}%</span>
+            </div>
+
+            <div className="flex items-center justify-center gap-4">
+              <label className="text-gray-700">{t('image_compress.output_format') || 'Output Format'}:</label>
+              <select
+                value={outputFormat}
+                onChange={(e) => setOutputFormat(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700"
+              >
+                <option value="image/jpeg">{t('image_compress.format_jpg') || 'JPEG (.jpg)'}</option>
+                <option value="image/png">{t('image_compress.format_png') || 'PNG (.png)'}</option>
+                <option value="image/webp">{t('image_compress.format_webp') || 'WebP (.webp)'}</option>
+              </select>
             </div>
 
             <div className="text-center text-gray-600">

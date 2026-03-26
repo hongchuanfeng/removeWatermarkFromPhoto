@@ -175,20 +175,12 @@ export default function Navbar() {
                           <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                         </Link>
                         <Link 
-                          href={getLangPath('/remove-background', language)} 
+                          href={getLangPath('/ai-remove-background', language)} 
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                         >
-                          <span>{t('nav.ai_remove_background')}</span>
-                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
-                        </Link>
-                        <Link 
-                          href={getLangPath('/text-to-image', language)} 
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
-                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
-                        >
-                          <span>{t('nav.ai_text_to_image')}</span>
-                          <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                          <span>{t('nav.ai_remove_background_new')}</span>
+                          <span className="text-xs bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-0.5 rounded-full">NEW</span>
                         </Link>
                         <Link 
                           href={getLangPath('/ai-drawing', language)} 
@@ -205,6 +197,14 @@ export default function Navbar() {
                         >
                           <span>{t('nav.ai_comic')}</span>
                           <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                        </Link>
+                        <Link 
+                          href={getLangPath('/ai-text-to-image', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          <span>{t('nav.ai_text_to_image')}</span>
+                          <span className="text-xs bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-0.5 rounded-full">NEW</span>
                         </Link>
                       </div>
 
@@ -233,6 +233,13 @@ export default function Navbar() {
                           onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
                         >
                           {t('nav.image_grid')}
+                        </Link>
+                        <Link 
+                          href={getLangPath('/nine-grid', language)} 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => { handleMenuLeave(); setMobileOpen(false); }}
+                        >
+                          {t('nav.image_nine_grid')}
                         </Link>
                         <Link 
                           href={getLangPath('/rounded-corner', language)} 
@@ -916,13 +923,9 @@ export default function Navbar() {
                     <span>{t('nav.ai_face_beautify')}</span>
                     <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
                   </Link>
-                  <Link href={getLangPath('/remove-background', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
-                    <span>{t('nav.ai_remove_background')}</span>
-                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
-                  </Link>
-                  <Link href={getLangPath('/text-to-image', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
-                    <span>{t('nav.ai_text_to_image')}</span>
-                    <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full">VIP</span>
+                  <Link href={getLangPath('/ai-remove-background', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
+                    <span>{t('nav.ai_remove_background_new')}</span>
+                    <span className="text-xs bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-0.5 rounded-full">NEW</span>
                   </Link>
                   <Link href={getLangPath('/ai-drawing', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-between" onClick={() => setMobileOpen(false)}>
                     <span>{t('nav.ai_drawing')}</span>
@@ -945,6 +948,9 @@ export default function Navbar() {
                   </Link>
                   <Link href={getLangPath('/image-grid', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.image_grid')}
+                  </Link>
+                  <Link href={getLangPath('/nine-grid', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+                    {t('nav.image_nine_grid')}
                   </Link>
                   <Link href={getLangPath('/rounded-corner', language)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
                     {t('nav.rounded_corner')}

@@ -1,10 +1,10 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useState, useRef } from 'react'
-import { removeBackground } from '@imgly/background-removal'
+import { useState, useRef, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function RemoveBackground() {
+export default function AIRemoveBackground() {
   const { t } = useLanguage()
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -12,21 +12,23 @@ export default function RemoveBackground() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [processingProgress, setProcessingProgress] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
-  const [backgroundColor, setBackgroundColor] = useState<'transparent' | 'white' | 'custom'>('transparent')
-  const [customColor, setCustomColor] = useState('#ffffff')
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<any>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [supabase.auth])
 
   const examples = [
-    { image: '/image/background/1.jpg', title: t('remove_background.example_desc1') },
-    { image: '/image/background/2.jpg', title: t('remove_background.example_desc2') },
-    { image: '/image/background/3.jpg', title: t('remove_background.example_desc3') },
-  ]
-
-  const backgroundOptions = [
-    { value: 'transparent', label: t('remove_background.bg_transparent') || 'Transparent', color: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)' },
-    { value: 'white', label: t('remove_background.bg_white') || 'White', color: '#ffffff' },
-    { value: 'custom', label: t('remove_background.bg_custom') || 'Custom', color: customColor },
+    { image: '/image/background/1.jpg', title: t('ai_remove_background.example_desc1') },
+    { image: '/image/background/2.jpg', title: t('ai_remove_background.example_desc2') },
+    { image: '/image/background/3.jpg', title: t('ai_remove_background.example_desc3') },
   ]
 
   const getFormatFromMimeType = (mimeType: string): string => {
@@ -93,40 +95,54 @@ export default function RemoveBackground() {
   }
 
   const processImage = async () => {
-    if (!file) return
+    if (!file || !previewUrl) return
+
+    if (!user) {
+      setError(t('ai_remove_background.login_required') || 'Please login first')
+      return
+    }
 
     setIsProcessing(true)
     setProcessingProgress(0)
     setError(null)
 
     try {
-      const objectUrl = URL.createObjectURL(file)
-
-      await removeBackground(objectUrl, {
-        progress: (key: string, current: number, total: number) => {
-          if (key === 'compute:inference') {
-            setProcessingProgress(Math.round((current / total) * 100))
+      const progressInterval = setInterval(() => {
+        setProcessingProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return prev
           }
+          return prev + Math.random() * 15
+        })
+      }, 500)
+
+      const response = await fetch('/api/remove-background', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        output: {
-          format: 'image/png',
-          quality: 1,
-        },
-      }).then((blob: Blob) => {
-        const url = URL.createObjectURL(blob)
-        setProcessedUrl(url)
-        setIsProcessing(false)
-        setProcessingProgress(100)
-      }).catch((err: Error) => {
-        console.error('Background removal error:', err)
-        setError(err.message || 'Failed to remove background')
-        setIsProcessing(false)
+        body: JSON.stringify({
+          imageUrl: previewUrl,
+          userId: user.id,
+        }),
       })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Failed to remove background')
+      }
+      
+      clearInterval(progressInterval)
+      setProcessingProgress(100)
+      setProcessedUrl(data.resultImage)
+      setIsProcessing(false)
 
     } catch (err: any) {
       console.error('Error processing image:', err)
       setIsProcessing(false)
-      setError(err.message || t('remove_background.error_message') || 'An error occurred while processing the image.')
+      setError(err.message || t('ai_remove_background.error_message') || 'An error occurred while processing the image.')
     }
   }
 
@@ -136,7 +152,7 @@ export default function RemoveBackground() {
     const link = document.createElement('a')
     link.href = processedUrl
     const baseName = file.name.replace(/\.[^/.]+$/, '')
-    link.download = baseName + '_no_background.png'
+    link.download = baseName + '_ai_background_removed.png'
     link.click()
   }
 
@@ -144,32 +160,27 @@ export default function RemoveBackground() {
     handleClearFile()
   }
 
-  const getResultStyle = () => {
-    if (backgroundColor === 'transparent') {
-      return { background: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundPosition: '0 0, 8px 8px' }
-    } else if (backgroundColor === 'white') {
-      return { background: '#ffffff' }
-    } else {
-      return { background: customColor }
-    }
-  }
-
   return (
     <div className="py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
+          <div className="inline-block mb-4">
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium px-4 py-1.5 rounded-full">
+              {t('ai_remove_background.badge') || 'AI Powered'}
+            </span>
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {t('remove_background.title')}
+            {t('ai_remove_background.title')}
           </h1>
           <p className="text-xl text-gray-600">
-            {t('remove_background.description')}
+            {t('ai_remove_background.description')}
           </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
           {!file ? (
             <div
-              className={`border-2 border-dashed rounded-lg p-12 text-center transition cursor-pointer ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'}`}
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition cursor-pointer ${isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-500'}`}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -184,15 +195,15 @@ export default function RemoveBackground() {
                 id="image-upload"
               />
               <div className="cursor-pointer">
-                <div className="text-6xl mb-4">🪄</div>
+                <div className="text-6xl mb-4">✨</div>
                 <p className="text-lg text-gray-700 mb-2">
-                  {t('remove_background.upload_title')}
+                  {t('ai_remove_background.upload_title')}
                 </p>
                 <p className="text-sm text-gray-500 mb-2">
-                  {t('remove_background.click_to_upload')}
+                  {t('ai_remove_background.click_to_upload')}
                 </p>
                 <p className="text-sm text-gray-400">
-                  {t('remove_background.supported_formats')}
+                  {t('ai_remove_background.supported_formats')}
                 </p>
               </div>
             </div>
@@ -221,7 +232,7 @@ export default function RemoveBackground() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">
-                    {t('remove_background.original_image') || 'Original Image'}
+                    {t('ai_remove_background.original_image') || 'Original Image'}
                   </p>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-100">
                     <img
@@ -234,11 +245,11 @@ export default function RemoveBackground() {
 
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">
-                    {t('remove_background.result') || 'Result'}
+                    {t('ai_remove_background.result') || 'Result'}
                   </p>
                   <div 
                     className="border-2 border-dashed border-gray-300 rounded-lg p-2"
-                    style={getResultStyle()}
+                    style={{ background: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%)', backgroundSize: '16px 16px', backgroundPosition: '0 0, 8px 8px' }}
                   >
                     {processedUrl ? (
                       <img
@@ -248,7 +259,7 @@ export default function RemoveBackground() {
                       />
                     ) : (
                       <div className="w-full h-80 flex items-center justify-center text-gray-400">
-                        {t('remove_background.waiting_process') || 'Waiting for processing...'}
+                        {t('ai_remove_background.waiting_process') || 'Waiting for processing...'}
                       </div>
                     )}
                   </div>
@@ -262,62 +273,31 @@ export default function RemoveBackground() {
               )}
 
               {!processedUrl && !isProcessing && (
-                <div className="mb-6">
-                  <p className="text-sm font-medium text-gray-700 mb-3">
-                    {t('remove_background.select_bg') || 'Select Background Color'}
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {backgroundOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setBackgroundColor(option.value as 'transparent' | 'white' | 'custom')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${backgroundColor === option.value ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                      >
-                        <span 
-                          className="inline-block w-4 h-4 rounded border border-gray-300 mr-2 align-middle"
-                          style={{ background: option.color }}
-                        />
-                        {option.label}
-                      </button>
-                    ))}
-                    {backgroundColor === 'custom' && (
-                      <input
-                        type="color"
-                        value={customColor}
-                        onChange={(e) => setCustomColor(e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {!processedUrl && !isProcessing && (
                 <button
                   onClick={processImage}
-                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition flex items-center justify-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  {t('remove_background.remove_bg')}
+                  {t('ai_remove_background.remove_bg')} (1 {t('ai_remove_background.credits') || 'credit'})
                 </button>
               )}
 
               {isProcessing && (
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-3 mb-4">
-                    <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <span className="text-lg text-gray-700">
-                      {t('remove_background.processing')} {Math.round(processingProgress)}%
+                      {t('ai_remove_background.processing')} {Math.round(processingProgress)}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${processingProgress}%` }}
                     ></div>
                   </div>
@@ -328,18 +308,18 @@ export default function RemoveBackground() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <button
                     onClick={handleDownload}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    {t('remove_background.download') || t('common.download')}
+                    {t('ai_remove_background.download') || t('common.download')}
                   </button>
                   <button
                     onClick={handleProcessAnother}
                     className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
                   >
-                    {t('remove_background.process_another') || t('common.another')}
+                    {t('ai_remove_background.process_another') || t('common.another')}
                   </button>
                 </div>
               )}
@@ -349,50 +329,50 @@ export default function RemoveBackground() {
 
         <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('remove_background.features_title') || 'Key Features'}
+            {t('ai_remove_background.features_title') || 'Key Features'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg">
               <span className="text-2xl">🤖</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {t('remove_background.feature1') || 'AI-Powered'}
+                  {t('ai_remove_background.feature1') || 'AI-Powered'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t('remove_background.feature1_desc') || 'Smart AI automatically detects and removes backgrounds'}
+                  {t('ai_remove_background.feature1_desc') || 'Smart AI automatically detects and removes backgrounds'}
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg">
               <span className="text-2xl">⚡</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {t('remove_background.feature2') || 'Fast Processing'}
+                  {t('ai_remove_background.feature2') || 'Fast Processing'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t('remove_background.feature2_desc') || 'Get results in seconds, not minutes'}
+                  {t('ai_remove_background.feature2_desc') || 'Get results in seconds, not minutes'}
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg">
               <span className="text-2xl">🎨</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {t('remove_background.feature3') || 'Custom Backgrounds'}
+                  {t('ai_remove_background.feature3') || 'HD Quality'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t('remove_background.feature3_desc') || 'Replace background with any color or transparency'}
+                  {t('ai_remove_background.feature3_desc') || 'Maintain original image quality'}
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg">
               <span className="text-2xl">📱</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {t('remove_background.feature4') || 'HD Quality'}
+                  {t('ai_remove_background.feature4') || 'Precise Edges'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t('remove_background.feature4_desc') || 'Maintain original image quality'}
+                  {t('ai_remove_background.feature4_desc') || 'Preserve fine details like hair and fur'}
                 </p>
               </div>
             </div>
@@ -401,50 +381,39 @@ export default function RemoveBackground() {
 
         <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('remove_background.how_to_use_title') || 'How to Use'}
+            {t('ai_remove_background.how_to_use_title') || 'How to Use'}
           </h2>
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">1</div>
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
               <div>
                 <h3 className="font-medium text-gray-900">
-                  {t('remove_background.how_to_use_step1') || 'Upload Image'}
+                  {t('ai_remove_background.how_to_use_step1') || 'Upload Image'}
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  {t('remove_background.how_to_use_step1_desc') || 'Select an image file to remove background'}
+                  {t('ai_remove_background.how_to_use_step1_desc') || 'Select an image file to remove background'}
                 </p>
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">2</div>
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">2</div>
               <div>
                 <h3 className="font-medium text-gray-900">
-                  {t('remove_background.how_to_use_step2') || 'Select Background'}
+                  {t('ai_remove_background.how_to_use_step2') || 'AI Processing'}
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  {t('remove_background.how_to_use_step2_desc') || 'Choose transparent, white, or custom background'}
+                  {t('ai_remove_background.how_to_use_step2_desc') || 'Our AI automatically detects and removes the background'}
                 </p>
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">3</div>
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
               <div>
                 <h3 className="font-medium text-gray-900">
-                  {t('remove_background.how_to_use_step3') || 'Process'}
+                  {t('ai_remove_background.how_to_use_step3') || 'Download Result'}
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  {t('remove_background.how_to_use_step3_desc') || 'Click "Remove Background" to process'}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">4</div>
-              <div>
-                <h3 className="font-medium text-gray-900">
-                  {t('remove_background.how_to_use_step4') || 'Download Result'}
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  {t('remove_background.how_to_use_step4_desc') || 'Download your image without background'}
+                  {t('ai_remove_background.how_to_use_step3_desc') || 'Download your image with transparent background'}
                 </p>
               </div>
             </div>
@@ -453,39 +422,39 @@ export default function RemoveBackground() {
 
         <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('remove_background.faq_title') || 'FAQ'}
+            {t('ai_remove_background.faq_title') || 'FAQ'}
           </h2>
           <div className="space-y-6">
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('remove_background.faq_q1')}
+                {t('ai_remove_background.faq_q1')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('remove_background.faq_a1')}
+                {t('ai_remove_background.faq_a1')}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('remove_background.faq_q2')}
+                {t('ai_remove_background.faq_q2')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('remove_background.faq_a2')}
+                {t('ai_remove_background.faq_a2')}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('remove_background.faq_q3')}
+                {t('ai_remove_background.faq_q3')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('remove_background.faq_a3')}
+                {t('ai_remove_background.faq_a3')}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900">
-                {t('remove_background.faq_q4')}
+                {t('ai_remove_background.faq_q4')}
               </h3>
               <p className="text-gray-600 mt-1">
-                {t('remove_background.faq_a4')}
+                {t('ai_remove_background.faq_a4')}
               </p>
             </div>
           </div>
@@ -493,10 +462,10 @@ export default function RemoveBackground() {
 
         <div className="mt-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-            {t('remove_background.examples_title')}
+            {t('ai_remove_background.examples_title')}
           </h2>
           <p className="text-center text-gray-600 mb-12">
-            {t('remove_background.examples_desc')}
+            {t('ai_remove_background.examples_desc')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -507,7 +476,7 @@ export default function RemoveBackground() {
                   alt={example.title}
                   className="w-full h-48 object-cover"
                 />
-                <div className="p-4 bg-gray-50">
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50">
                   <p className="text-sm text-gray-600 font-medium">{example.title}</p>
                 </div>
               </div>

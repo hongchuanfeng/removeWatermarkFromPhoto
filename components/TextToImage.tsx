@@ -1,354 +1,352 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useState, useRef, useEffect } from 'react'
 
 export default function TextToImage() {
   const { t } = useLanguage()
-  const [prompt, setPrompt] = useState('')
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [processingProgress, setProcessingProgress] = useState(0)
-  const [error, setError] = useState<string | null>(null)
-  const [user, setUser] = useState<any>(null)
-  const supabase = createClientComponentClient()
+  const [text, setText] = useState('')
+  const [fontSize, setFontSize] = useState(48)
+  const [fontFamily, setFontFamily] = useState('Arial')
+  const [textColor, setTextColor] = useState('#000000')
+  const [bgColor, setBgColor] = useState('#ffffff')
+  const [bgTransparent, setBgTransparent] = useState(false)
+  const [padding, setPadding] = useState(20)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const examplePrompts = [
-    t('text_to_image.example1') || 'A beautiful sunset over the ocean',
-    t('text_to_image.example2') || 'A futuristic city with flying cars',
-    t('text_to_image.example3') || 'A cute cat wearing sunglasses',
+  const fontOptions = [
+    'Arial',
+    'Verdana',
+    'Times New Roman',
+    'Georgia',
+    'Courier New',
+    'Comic Sans MS',
+    'Impact',
+    'Trebuchet MS',
+  ]
+
+  const presetColors = [
+    '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff',
+    '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#88ff00',
   ]
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
     }
-    getUser()
-  }, [supabase.auth])
-
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return
-
-    if (!user) {
-      setError(t('text_to_image.login_required') || 'Please login first')
-      return
-    }
-
-    setIsGenerating(true)
-    setProcessingProgress(0)
-    setError(null)
-    setGeneratedImage(null)
-
-    try {
-      const progressInterval = setInterval(() => {
-        setProcessingProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval)
-            return prev
-          }
-          return prev + Math.random() * 10
-        })
-      }, 500)
-
-      const response = await fetch('/api/text-to-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          userId: user.id,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || data.details || 'Failed to generate image')
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
       }
-      
-      clearInterval(progressInterval)
-      setProcessingProgress(100)
-      setGeneratedImage(data.resultImage)
-      setIsGenerating(false)
-
-    } catch (err: any) {
-      console.error('Error generating image:', err)
-      setIsGenerating(false)
-      setError(err.message || t('text_to_image.error_message') || 'An error occurred while generating the image.')
     }
+  }, [previewUrl])
+
+  const generateImage = () => {
+    const canvas = canvasRef.current
+    if (!canvas || !text.trim()) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.font = `${fontSize}px "${fontFamily}"`
+    const metrics = ctx.measureText(text)
+    const textWidth = metrics.width
+    const textHeight = fontSize
+
+    const canvasWidth = textWidth + padding * 2
+    const canvasHeight = textHeight + padding * 2
+
+    canvas.width = canvasWidth
+    canvas.height = canvasHeight
+
+    if (bgTransparent) {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+    } else {
+      ctx.fillStyle = bgColor
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+    }
+
+    ctx.fillStyle = textColor
+    ctx.font = `${fontSize}px "${fontFamily}"`
+    ctx.textBaseline = 'top'
+    ctx.fillText(text, padding, padding)
+
+    const dataUrl = canvas.toDataURL('image/png')
+    setPreviewUrl(dataUrl)
   }
 
   const handleDownload = () => {
-    if (!generatedImage) return
-
+    if (!previewUrl) return
     const link = document.createElement('a')
-    link.href = generatedImage
-    link.download = `ai-generated-${Date.now()}.png`
+    link.href = previewUrl
+    link.download = `text-image-${Date.now()}.png`
     link.click()
   }
 
-  const handleGenerateAnother = () => {
-    setGeneratedImage(null)
-    setPrompt('')
-    setProcessingProgress(0)
-    setError(null)
+  const handleClear = () => {
+    setText('')
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
   }
 
-  const handleExampleClick = (example: string) => {
-    setPrompt(example)
-  }
+  const handleCopyToClipboard = async () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-  const characterCount = prompt.length
-  const maxCharacters = 500
+    try {
+      const blob = await new Promise<Blob | null>((resolve) => 
+        canvas.toBlob(resolve, 'image/png')
+      )
+      if (blob) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ])
+        alert(t('text_to_image.copied') || 'Copied to clipboard!')
+      }
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
 
   return (
     <div className="py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            {t('text_to_image.title')}
+            {t('text_to_image.title') || 'Text to Image'}
           </h1>
           <p className="text-xl text-gray-600">
-            {t('text_to_image.description')}
+            {t('text_to_image.description') || 'Convert your text into beautiful images'}
           </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
-          {!generatedImage ? (
-            <>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('text_to_image.prompt_label')}
-                </label>
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={t('text_to_image.prompt_placeholder') || 'Describe the image you want to generate...'}
-                  className="w-full h-40 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none placeholder:text-gray-900 text-gray-900"
-                  maxLength={maxCharacters}
-                />
-                <div className="flex justify-between mt-2">
-                  <span className="text-xs text-gray-500">
-                    {t('text_to_image.prompt_tip')}
-                  </span>
-                  <span className={`text-xs ${characterCount > maxCharacters * 0.9 ? 'text-orange-500' : 'text-gray-500'}`}>
-                    {characterCount}/{maxCharacters}
-                  </span>
-                </div>
-              </div>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('text_to_image.enter_text') || 'Enter Text'}
+            </label>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={t('text_to_image.text_placeholder') || 'Type your text here...'}
+              className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none placeholder:text-gray-400 text-gray-900"
+            />
+          </div>
 
-              {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
-
-              <div className="mb-6">
-                <p className="text-sm font-medium text-gray-700 mb-3">
-                  {t('text_to_image.examples_title')}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {examplePrompts.map((example, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleExampleClick(example)}
-                      className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition"
-                      disabled={isGenerating}
-                    >
-                      {example}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={handleGenerate}
-                disabled={!prompt.trim() || isGenerating}
-                className={`w-full py-3 px-6 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-                  !prompt.trim() || isGenerating
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                }`}
-              >
-                {isGenerating ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {t('text_to_image.generating')} {Math.round(processingProgress)}%
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    {t('text_to_image.generate')}
-                  </>
-                )}
-              </button>
-
-              {isGenerating && (
-                <div className="mt-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${processingProgress}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-6 p-4 bg-purple-50 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl">💡</span>
-                  <div>
-                    <p className="text-sm font-medium text-purple-900">
-                      {t('text_to_image.tip_title')}
-                    </p>
-                    <p className="text-sm text-purple-700 mt-1">
-                      {t('text_to_image.tip_content')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <div className="mb-6">
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  {t('text_to_image.your_prompt')}
-                </p>
-                <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
-                  {prompt}
-                </div>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('text_to_image.font_size') || 'Font Size'}: {fontSize}px
+              </label>
+              <input
+                type="range"
+                min="12"
+                max="120"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
 
-              <div className="mb-6">
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  {t('text_to_image.generated_image')}
-                </p>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-100">
-                  <img
-                    src={generatedImage}
-                    alt="Generated"
-                    className="w-full h-auto rounded"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('text_to_image.font_family') || 'Font Family'}
+              </label>
+              <select
+                value={fontFamily}
+                onChange={(e) => setFontFamily(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {fontOptions.map((font) => (
+                  <option key={font} value={font} style={{ fontFamily: font }}>
+                    {font}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('text_to_image.text_color') || 'Text Color'}
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={textColor}
+                  onChange={(e) => setTextColor(e.target.value)}
+                  className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                />
+                <span className="text-sm text-gray-500">{textColor}</span>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {presetColors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setTextColor(color)}
+                    className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition"
+                    style={{ backgroundColor: color }}
                   />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('text_to_image.background') || 'Background'}
+              </label>
+              <div className="flex items-center gap-4 mb-2">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={bgTransparent}
+                    onChange={(e) => setBgTransparent(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">{t('text_to_image.transparent') || 'Transparent'}</span>
+                </label>
+              </div>
+              {!bgTransparent && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={bgColor}
+                    onChange={(e) => setBgColor(e.target.value)}
+                    className="w-12 h-10 rounded cursor-pointer border border-gray-300"
+                  />
+                  <span className="text-sm text-gray-500">{bgColor}</span>
                 </div>
+              )}
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('text_to_image.padding') || 'Padding'}: {padding}px
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={padding}
+                onChange={(e) => setPadding(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4 mb-6">
+            <button
+              onClick={generateImage}
+              disabled={!text.trim()}
+              className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+                !text.trim()
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {t('text_to_image.generate') || 'Generate Image'}
+            </button>
+
+            <button
+              onClick={handleClear}
+              className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+            >
+              {t('text_to_image.clear') || 'Clear'}
+            </button>
+          </div>
+
+          {previewUrl && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('text_to_image.preview') || 'Preview'}
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 text-center">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-w-full h-auto mx-auto"
+                />
               </div>
 
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap justify-center gap-4 mt-6">
                 <button
                   onClick={handleDownload}
-                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  {t('text_to_image.download')}
+                  {t('text_to_image.download') || 'Download'}
                 </button>
                 <button
-                  onClick={handleGenerateAnother}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  onClick={handleCopyToClipboard}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
                 >
-                  {t('text_to_image.generate_another')}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  {t('text_to_image.copy') || 'Copy to Clipboard'}
                 </button>
               </div>
             </div>
           )}
+
+          <canvas ref={canvasRef} className="hidden" />
         </div>
 
         <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('text_to_image.features_title')}
+            {t('text_to_image.features_title') || 'Features'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="text-2xl">🤖</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature1')}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature1_desc')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="text-2xl">⚡</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature2')}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature2_desc')}
-                </p>
-              </div>
-            </div>
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <span className="text-2xl">🎨</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature3')}
+                  {t('text_to_image.feature1') || 'Customizable Fonts'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature3_desc')}
+                  {t('text_to_image.feature1_desc') || 'Choose from multiple font families and sizes'}
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="text-2xl">📱</span>
+              <span className="text-2xl">🌈</span>
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {t('text_to_image.feature4')}
+                  {t('text_to_image.feature2') || 'Color Options'}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {t('text_to_image.feature4_desc')}
+                  {t('text_to_image.feature2_desc') || 'Custom text and background colors'}
                 </p>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-8 bg-white rounded-lg shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {t('text_to_image.faq_title')}
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q1')}
-              </h3>
-              <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a1')}
-              </p>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">📋</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {t('text_to_image.feature3') || 'Copy to Clipboard'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {t('text_to_image.feature3_desc') || 'Easily copy generated images'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q2')}
-              </h3>
-              <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a2')}
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q3')}
-              </h3>
-              <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a3')}
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">
-                {t('text_to_image.faq_q4')}
-              </h3>
-              <p className="text-gray-600 mt-1">
-                {t('text_to_image.faq_a4')}
-              </p>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">⬇️</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {t('text_to_image.feature4') || 'Download PNG'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {t('text_to_image.feature4_desc') || 'Export high-quality PNG images'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
