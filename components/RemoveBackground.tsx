@@ -1,8 +1,8 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useState, useRef } from 'react'
-import { removeBackground } from '@imgly/background-removal'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { removeBackground, preload } from '@imgly/background-removal'
 
 export default function RemoveBackground() {
   const { t } = useLanguage()
@@ -14,7 +14,38 @@ export default function RemoveBackground() {
   const [backgroundColor, setBackgroundColor] = useState<'transparent' | 'white' | 'custom'>('transparent')
   const [customColor, setCustomColor] = useState('#ffffff')
   const [error, setError] = useState<string | null>(null)
+  const [downloadProgress, setDownloadProgress] = useState(0)
+  const [processingStep, setProcessingStep] = useState('')
+  const [isPreloading, setIsPreloading] = useState(true)
+  const [isPreloaded, setIsPreloaded] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Preload assets on component mount
+  useEffect(() => {
+    const preloadAssets = async () => {
+      setIsPreloading(true)
+      try {
+        await preload({
+          progress: (key, current, total) => {
+            if (total > 0) {
+              const percent = Math.round((current / total) * 100)
+              setDownloadProgress(percent)
+              setProcessingStep(key)
+            }
+          },
+        })
+        setIsPreloaded(true)
+        setIsPreloading(false)
+        setDownloadProgress(100)
+      } catch (err) {
+        console.error('Preload error:', err)
+        // Continue anyway - the library will download on demand
+        setIsPreloading(false)
+        setIsPreloaded(true)
+      }
+    }
+    preloadAssets()
+  }, [])
 
   const examples = [
     { image: '/image/background/1.jpg', title: t('remove_background.example_desc1') },
@@ -84,9 +115,6 @@ export default function RemoveBackground() {
     setPreviewUrl(null)
     setProcessedUrl(null)
     setError(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
   }
 
   const processImage = async () => {
@@ -94,9 +122,23 @@ export default function RemoveBackground() {
 
     setIsProcessing(true)
     setError(null)
+    setDownloadProgress(0)
+    setProcessingStep('processing')
 
     try {
       const result = await removeBackground(file, {
+        // Use smaller FP16 model for faster processing
+        model: 'isnet_fp16',
+        // Configure for faster processing
+        device: 'cpu', // CPU is more reliable, GPU can be faster on supported devices
+        // Progress callback
+        progress: (key, current, total) => {
+          if (total > 0) {
+            const percent = Math.round((current / total) * 100)
+            setDownloadProgress(percent)
+            setProcessingStep(key)
+          }
+        },
         output: {
           format: 'image/png',
           quality: 1,
@@ -105,6 +147,7 @@ export default function RemoveBackground() {
 
       const url = URL.createObjectURL(result)
       setProcessedUrl(url)
+      setDownloadProgress(100)
     } catch (err: any) {
       console.error('Error processing image:', err)
       setError(err.message || t('remove_background.error_message') || 'An error occurred while processing the image.')
@@ -137,6 +180,22 @@ export default function RemoveBackground() {
     }
   }
 
+  const getProgressText = () => {
+    if (isPreloading) {
+      if (processingStep === 'model' || processingStep === 'onnx') {
+        return t('remove_background.downloading_model') || `Downloading AI model... ${downloadProgress}%`
+      }
+      return t('remove_background.preparing') || `Preparing... ${downloadProgress}%`
+    }
+    if (isProcessing) {
+      if (processingStep === 'fetch' || processingStep === 'downloading') {
+        return t('remove_background.downloading') || `Downloading... ${downloadProgress}%`
+      }
+      return t('remove_background.processing') || `Processing... ${downloadProgress}%`
+    }
+    return ''
+  }
+
   return (
     <div className="py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -149,11 +208,32 @@ export default function RemoveBackground() {
           </p>
         </div>
 
+        {(isPreloading || downloadProgress < 100) && !file && (
+          <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
+            <div className="text-center">
+              <div className="text-5xl mb-4">🤖</div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                {t('remove_background.preparing_ai') || 'Preparing AI Model'}
+              </h2>
+              <p className="text-gray-600 mb-4">
+                {t('remove_background.first_time_load') || 'Loading AI model for the first time (this only happens once)'}
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                <div 
+                  className="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+                  style={{ width: `${downloadProgress}%` }}
+                />
+              </div>
+              <p className="text-sm text-gray-500">{getProgressText()}</p>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-xl p-8">
           {!file ? (
             <div
               className={`border-2 border-dashed rounded-lg p-12 text-center transition cursor-pointer ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'}`}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => isPreloaded && fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -166,7 +246,7 @@ export default function RemoveBackground() {
                 className="hidden"
                 id="image-upload"
               />
-              <div className="cursor-pointer">
+              <div className={`cursor-pointer ${!isPreloaded ? 'opacity-50 pointer-events-none' : ''}`}>
                 <div className="text-6xl mb-4">🪄</div>
                 <p className="text-lg text-gray-700 mb-2">
                   {t('remove_background.upload_title')}
@@ -244,7 +324,7 @@ export default function RemoveBackground() {
                 </div>
               )}
 
-              {!processedUrl && !isProcessing && (
+              {!processedUrl && (
                 <div className="mb-6">
                   <p className="text-sm font-medium text-gray-700 mb-3">
                     {t('remove_background.select_bg') || 'Select Background Color'}
@@ -288,11 +368,20 @@ export default function RemoveBackground() {
               )}
 
               {isProcessing && (
-                <div className="flex items-center justify-center gap-3">
-                  <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center justify-center gap-3">
+                    <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-gray-600">{getProgressText()}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${downloadProgress}%` }}
+                    />
+                  </div>
                 </div>
               )}
 
