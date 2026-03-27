@@ -3,8 +3,18 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     unoptimized: true,
-    domains: ['image-1308733829.cos.ap-shanghai.myqcloud.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'image-1308733829.cos.ap-shanghai.myqcloud.com',
+      },
+    ],
   },
+  // Transpile these packages so webpack processes them correctly
+  transpilePackages: [
+    'onnxruntime-web',
+    '@imgly/background-removal',
+  ],
 }
 
 module.exports = nextConfig

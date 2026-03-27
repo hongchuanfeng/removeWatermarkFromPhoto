@@ -889,3 +889,7 @@ npm error node_modules/onnxruntime-web
 npm error   peer onnxruntime-web@"1.21.0" from @imgly/background-removal@1.7.0
 npm error   node_modules/@imgly/background-removal
 npm error     @imgly/background-removal@"^1.7.0" from the root project
+
+
+
+/nine-grid，这个页面再加上功能说明，使用方法，常见问题，要实现多语言，请实现

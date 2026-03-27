@@ -241,6 +241,82 @@ export default function ImageNineGrid() {
             </div>
           </div>
         </div>
+
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">{t('image_nine_grid.features_title')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">⚡</span>
+              <div>
+                <h4 className="font-semibold text-gray-900">{t('image_nine_grid.feature1')}</h4>
+                <p className="text-sm text-gray-600">{t('image_nine_grid.feature1_desc')}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">📱</span>
+              <div>
+                <h4 className="font-semibold text-gray-900">{t('image_nine_grid.feature2')}</h4>
+                <p className="text-sm text-gray-600">{t('image_nine_grid.feature2_desc')}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">🆓</span>
+              <div>
+                <h4 className="font-semibold text-gray-900">{t('image_nine_grid.feature3')}</h4>
+                <p className="text-sm text-gray-600">{t('image_nine_grid.feature3_desc')}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <span className="text-2xl">🔒</span>
+              <div>
+                <h4 className="font-semibold text-gray-900">{t('image_nine_grid.feature4')}</h4>
+                <p className="text-sm text-gray-600">{t('image_nine_grid.feature4_desc')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">{t('image_nine_grid.faq_title')}</h3>
+          <div className="space-y-4">
+            <details className="group">
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-black">
+                <span>{t('image_nine_grid.faq_q1')}</span>
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="m6 9 6 6 6-6"></path></svg>
+                </span>
+              </summary>
+              <p className="text-gray-600 mt-2 p-3">{t('image_nine_grid.faq_a1')}</p>
+            </details>
+            <details className="group">
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-black">
+                <span>{t('image_nine_grid.faq_q2')}</span>
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="m6 9 6 6 6-6"></path></svg>
+                </span>
+              </summary>
+              <p className="text-gray-600 mt-2 p-3">{t('image_nine_grid.faq_a2')}</p>
+            </details>
+            <details className="group">
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-black">
+                <span>{t('image_nine_grid.faq_q3')}</span>
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="m6 9 6 6 6-6"></path></svg>
+                </span>
+              </summary>
+              <p className="text-gray-600 mt-2 p-3">{t('image_nine_grid.faq_a3')}</p>
+            </details>
+            <details className="group">
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-black">
+                <span>{t('image_nine_grid.faq_q4')}</span>
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="m6 9 6 6 6-6"></path></svg>
+                </span>
+              </summary>
+              <p className="text-gray-600 mt-2 p-3">{t('image_nine_grid.faq_a4')}</p>
+            </details>
+          </div>
+        </div>
       </div>
     </div>
   )

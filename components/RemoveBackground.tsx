@@ -10,7 +10,6 @@ export default function RemoveBackground() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [processedUrl, setProcessedUrl] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [processingProgress, setProcessingProgress] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [backgroundColor, setBackgroundColor] = useState<'transparent' | 'white' | 'custom'>('transparent')
   const [customColor, setCustomColor] = useState('#ffffff')
@@ -53,7 +52,6 @@ export default function RemoveBackground() {
     const url = URL.createObjectURL(selectedFile)
     setPreviewUrl(url)
     setProcessedUrl(null)
-    setProcessingProgress(0)
     setError(null)
   }
 
@@ -85,7 +83,6 @@ export default function RemoveBackground() {
     setFile(null)
     setPreviewUrl(null)
     setProcessedUrl(null)
-    setProcessingProgress(0)
     setError(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -96,37 +93,23 @@ export default function RemoveBackground() {
     if (!file) return
 
     setIsProcessing(true)
-    setProcessingProgress(0)
     setError(null)
 
     try {
-      const objectUrl = URL.createObjectURL(file)
-
-      await removeBackground(objectUrl, {
-        progress: (key: string, current: number, total: number) => {
-          if (key === 'compute:inference') {
-            setProcessingProgress(Math.round((current / total) * 100))
-          }
-        },
+      const result = await removeBackground(file, {
         output: {
           format: 'image/png',
           quality: 1,
         },
-      }).then((blob: Blob) => {
-        const url = URL.createObjectURL(blob)
-        setProcessedUrl(url)
-        setIsProcessing(false)
-        setProcessingProgress(100)
-      }).catch((err: Error) => {
-        console.error('Background removal error:', err)
-        setError(err.message || 'Failed to remove background')
-        setIsProcessing(false)
       })
 
+      const url = URL.createObjectURL(result)
+      setProcessedUrl(url)
     } catch (err: any) {
       console.error('Error processing image:', err)
-      setIsProcessing(false)
       setError(err.message || t('remove_background.error_message') || 'An error occurred while processing the image.')
+    } finally {
+      setIsProcessing(false)
     }
   }
 
@@ -305,22 +288,11 @@ export default function RemoveBackground() {
               )}
 
               {isProcessing && (
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span className="text-lg text-gray-700">
-                      {t('remove_background.processing')} {Math.round(processingProgress)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${processingProgress}%` }}
-                    ></div>
-                  </div>
+                <div className="flex items-center justify-center gap-3">
+                  <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
                 </div>
               )}
 

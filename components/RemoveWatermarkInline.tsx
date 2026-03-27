@@ -31,6 +31,7 @@ export default function RemoveWatermarkInline() {
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null)
   const [currentArea, setCurrentArea] = useState<WatermarkArea | null>(null)
   const [didDrag, setDidDrag] = useState(false)
+  const [processingProgress, setProcessingProgress] = useState(0)
   const imageRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
@@ -87,50 +88,74 @@ export default function RemoveWatermarkInline() {
       return
     }
 
-    if (!user) {
-      router.push('/auth/login')
-      return
-    }
-
-    if (userCredits === null || userCredits <= 0) {
-      setError(t('removeWatermark.insufficientCredits'))
-      router.push('/subscribe')
-      return
-    }
-
     setLoading(true)
     setError(null)
+    setProcessingProgress(0)
 
     try {
-      const formData = new FormData()
-      formData.append('image', file)
+      const img = new window.Image()
+      img.crossOrigin = 'anonymous'
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('Failed to load image'))
+        img.src = preview!
+      })
+
+      setProcessingProgress(20)
+
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+
+      setProcessingProgress(40)
 
       if (watermarkAreas.length > 0) {
         const area = watermarkAreas[0]
-        formData.append('x', area.x.toString())
-        formData.append('y', area.y.toString())
-        formData.append('width', area.width.toString())
-        formData.append('height', area.height.toString())
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
+        const { x, y, width, height } = area
+        
+        for (let py = y; py < y + height; py++) {
+          for (let px = x; px < x + width; px++) {
+            let r = 0, g = 0, b = 0, count = 0
+            
+            for (let dy = -5; dy <= 5; dy++) {
+              for (let dx = -5; dx <= 5; dx++) {
+                if (dx === 0 && dy === 0) continue
+                const nx = px + dx
+                const ny = py + dy
+                if (nx < 0 || nx >= canvas.width || ny < 0 || ny >= canvas.height) continue
+                if (nx >= x && nx < x + width && ny >= y && ny < y + height) continue
+                
+                const nidx = (ny * canvas.width + nx) * 4
+                r += data[nidx]
+                g += data[nidx + 1]
+                b += data[nidx + 2]
+                count++
+              }
+            }
+            
+            if (count > 0) {
+              const idx = (py * canvas.width + px) * 4
+              data[idx] = r / count
+              data[idx + 1] = g / count
+              data[idx + 2] = b / count
+            }
+          }
+        }
+        
+        ctx.putImageData(imageData, 0, 0)
       }
 
-      const response = await fetch('/api/remove-watermark', {
-        method: 'POST',
-        body: formData,
-      })
+      setProcessingProgress(80)
 
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to remove watermark')
-      }
-
-      setResult(data.resultUrl)
-
-      const { data: updatedUser } = await supabase
-        .from('users')
-        .select('credits')
-        .eq('id', user.id)
-        .single()
-      if (updatedUser) setUserCredits(updatedUser.credits)
+      const resultDataUrl = canvas.toDataURL('image/png')
+      setResult(resultDataUrl)
+      setProcessingProgress(100)
     } catch (err: any) {
       setError(err.message || 'An error occurred')
     } finally {
@@ -364,7 +389,10 @@ export default function RemoveWatermarkInline() {
                 {loading ? (
                   <div className="text-center">
                     <div className="w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">{t('removeWatermark.processing')}</p>
+                    <p className="text-gray-600">{t('removeWatermark.processing')} {Math.round(processingProgress)}%</p>
+                    <div className="w-48 h-2 bg-gray-200 rounded-full mt-2 mx-auto overflow-hidden">
+                      <div className="h-full bg-primary-600 transition-all duration-300" style={{ width: `${processingProgress}%` }}></div>
+                    </div>
                   </div>
                 ) : result ? (
                   <div>
@@ -400,7 +428,7 @@ export default function RemoveWatermarkInline() {
               disabled={!file || loading}
               className="bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? t('removeWatermark.processing') : t('removeWatermark.removeButton')}
+              {loading ? `${t('removeWatermark.processing')} ${Math.round(processingProgress)}%` : t('removeWatermark.removeButton')}
             </button>
           </div>
         </div>
