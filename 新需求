@@ -867,5 +867,25 @@ High-quality text-to-speech output
 
 
 
-在“图片工具” 下面的 在这个二级菜单“图片处理”下面再添加一个“图片九宫格”的二级菜单，
+在“图片工具” 下面的在这个二级菜单“图片处理”下面再添加一个“图片九宫格”的二级菜单，
 免费使用，就是将一张图片切为9宫格，让用户下载即可，要实现多语言，请实现。
+
+
+
+/ai-text-to-image，标题是”AI文生图“，/text-to-image, 这个页面的改为”文字转图片“，请修改，请实现。
+
+
+npm error Found: onnxruntime-web@1.24.3
+npm error node_modules/onnxruntime-web
+npm error   onnxruntime-web@"^1.24.3" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error peer onnxruntime-web@"1.21.0" from @imgly/background-removal@1.7.0
+npm error node_modules/@imgly/background-removal
+npm error   @imgly/background-removal@"^1.7.0" from the root project
+npm error
+npm error Conflicting peer dependency: onnxruntime-web@1.21.0
+npm error node_modules/onnxruntime-web
+npm error   peer onnxruntime-web@"1.21.0" from @imgly/background-removal@1.7.0
+npm error   node_modules/@imgly/background-removal
+npm error     @imgly/background-removal@"^1.7.0" from the root project
